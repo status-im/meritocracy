@@ -1,30 +1,17 @@
 pragma solidity ^0.5.0;
 
 /*
-Goals:
-- Anyone can allocate Token to contributor base
-
-
 Future Goals:
 - remove admins necessity
 - encourage contributors to allocate
 
-Notes:
-
-Dapp:
+DApp:
 - show tokens to allocate
 - allocate token to person with praise
 - leaderboard, showing amount totalReceived and totalForfeited and amount, praises https://codepen.io/lewismcarey/pen/GJZVoG
 - allows you to send SNT to meritocracy
 - add/remove contributor
 - add/remove adminstrator
-
-
-and Meritocracy
-
-Extension that allows you to :
-    - =give a contributor status
-    - withdraw snt
 */
 
 import "token/ERC20Token.sol";

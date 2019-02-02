@@ -8,6 +8,10 @@ The Status Meritocracy is a SNT Reward System that allows a `Contributor` in the
 
 The DApp will also display a leaderboard of `Contributors` who have been awarded the most and have partcipated the most in the Meritocracy, along with their praise
 
+### Goals
+- Allow `Contributors` to build social capital, ideally in the form of Merit (degrades to popularity?)
+- Reward `Contributors` for impressing `Contributors`
+
 ### Roles
 #### Contributor
 Abilities:
@@ -19,7 +23,7 @@ Abilities:
 Abilities:
 - add/remove `Contributors`
 - set upper limit of `Contributor` `registry`
-- forfeit all `Contributors` allocatable SNT, can only be called once a week at maximum.
+- forfeit all `Contributors` allocatable SNT (but not awarded), can only be called once a week.
 
 #### Owner 
 Abilities:
