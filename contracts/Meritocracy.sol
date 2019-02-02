@@ -31,7 +31,7 @@ contract Meritocracy {
         uint256 totalForfeited; // Allocations they've burnt, can be used to show non-active players.
         uint256 totalReceived;
         uint256 received; // Ignore amounts in Status struct, and use this as source of truth, can withdraw at any time
-        // bool inPot; // Require Contributor WARN: praiseed because there's some edge cases not dealt with
+        // bool inPot; // Require Contributor WARN: commented because there's some edge cases not dealt with
         Status[] status;
     }
 
