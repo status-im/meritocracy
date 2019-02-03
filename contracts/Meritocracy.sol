@@ -59,7 +59,7 @@ contract Meritocracy {
         Contributor memory cAllocator = contributors[msg.sender];
         // Requirements
         require(cAllocator.addr == msg.sender); // is sender a Contributor?
-        // require(ERC20Token(token).transferFrom(msg.sender, address(this), _amount)); // TODO fix this, check balance Contributor has funds to allocate
+        require(ERC20Token(token).transferFrom(msg.sender, address(this), _amount));
         // Body
         // cAllocator.inPot = true;
         individualAmount = _amount / registry.length;
@@ -125,7 +125,7 @@ contract Meritocracy {
         registry.push(_contributor);
     }
 
-    // Add Multiple Contributors to Tegistry in one tx
+    // Add Multiple Contributors to the Registry in one tx
     function addContributors(address[] calldata _newContributors ) external {
         // Requirements
         require(registry.length + _newContributors.length <= maxContributors);
