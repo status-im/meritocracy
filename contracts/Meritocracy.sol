@@ -40,17 +40,10 @@ contract Meritocracy {
     uint256 public lastForfeit; // timestamp to block admins calling forfeitAllocations too quickly
     address[] public registry; // array of contributor addresses
     uint256 public maxContributors; // Dynamic finite limit on registry.
-    mapping(address => bool) admins;
-    mapping(address => Contributor) contributors;
+    mapping(address => bool) public admins;
+    mapping(address => Contributor) public contributors;
 
     // Open Functions  ----------------------------------------------------------------------------------------
-
-    // Access a contributors award history for leaderboard
-    // function status (address _contributor) external view returns (Status[] status) {
-    //     // TODO can return array of struct ?? 
-    //     // i
-    //     status = contributors[_contributor].status;
-    // }
 
     // Split amount over each contributor in registry, anyone can contribute.
     function allocate(uint256 _amount) external {
@@ -66,6 +59,11 @@ contract Meritocracy {
         for (uint256 i = 0; i < registry.length; i++) {
                contributors[registry[i]].allocation += individualAmount;
         }
+    }
+
+    // Getter for Dynamic Array Length
+    function registryLength() external returns (uint256) {
+        return registry.length;
     }
 
     // Contributor Functions -------------------------------------------------------------------------------
@@ -118,7 +116,7 @@ contract Meritocracy {
         // Requirements
         require(admins[msg.sender]);
         require(registry.length + 1 <= maxContributors);
-        require(contributors[_contributor].addr != _contributor); // WARN: check if contributor already exists?
+        require(contributors[_contributor].addr == address(0));
         // Body
         Contributor storage c = contributors[_contributor];
         c.addr = _contributor;

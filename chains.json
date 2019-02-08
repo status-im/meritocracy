@@ -78,5 +78,629 @@
         "address": "0x68B8c6cB36B5E476Bb31598C82D91810cda740B8"
       }
     }
+  },
+  "0xb48197af1aae17ea5658f53c14ec0696b7dc334014fdeb4fe0074ddc3fa7aa6d": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x4bbf0c67cd823e9483916babf64dda6594cc353a2346fb1d1e3a7b263ac151a4": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x6d67cbf7e364b4d874227e87a8041b687f45e80b542140fa74b6965e63232234": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xcfe27940c49fda8b05e99d82e681de9a8e33271836453de3feb2ffed679ae8ec": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xdca0553778dd8ac04b5924d7b0ca32326675fcfb352f7afd1caebf333fb58ffe": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x416f6c9811112226f50ce2cfa1ba6f68644912ef8fc592fc76162a0071ed6316": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x9ac1ae00a36c65a3db2af6ecb13c957c1eaeb0dad4b1e144f24705eb453e2916": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x59d06ad28a7220c75b8ea8e716c77e4ce4046cf83be3f2780bb0b38037db2182": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x0d79b3003b37610807836d281028bb229626793ff4afdda711bc553c065c6ae3": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x79c20c953b22dfa8d1149a0c931c58a09dc71940be88b30b6aaffcaa40bf91f5": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x43259ba4de7511b3a4e8d131589377f6cb8f10d442d102ecca6c7fde10c3f28e": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x8c86836e9f7da95cb0ffc1876193905c9efa89ecde8bbabf9d956dab37f60040": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xf9390365d3359d82130240fb82d641f549c765a583bc94e849a8f09244a89936": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9e5bab5e4c9e4d611f84e5a5826401806fb721215d932957d8754493ae753c0f": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xe059e945b2ccecf2ab8f62f04e80a9b0e11f61636f14c25d2d19ba4dd6446b3b": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0xe312465a5009642014a9880698b4c2a3ea2bd910d7ab5f0aabc35aec44d717af": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x968a54017c9a8d782e2efefe8ab87a536e5dea2d1c6e23b5a2f59fe30b9f5d11": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0xe312465a5009642014a9880698b4c2a3ea2bd910d7ab5f0aabc35aec44d717af": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x99cacc9d542f7e469d3bd080aa821ec2488479f59b5757fe537431153e06eeaa": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0xe312465a5009642014a9880698b4c2a3ea2bd910d7ab5f0aabc35aec44d717af": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x70d2e63eafb7f74ae0ca38ee78726e13c0a527cf68ab7d6a2cce6faa0eab71b4": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xa5dedbca74d432e3d988a51e6419156d895b5b06eb37d92daebb9d739043bc3b": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xc8557bde399a5c9c58f215a5374178df120f3b74a969b5547938234a0e088677": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x5a8718add47b3578b845352cc33532ac62a310dd1fcdd81b6cf2936b7f5c6416": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x470337dc98ae7d33f1e4892e624f6456f37d8c7e8d9f16f2595c7da4b720ab11": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x47408820a01b898884d3388cb4dc9f9a17018f108abe46aa71296a4533e04a71": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xe4ed11e7aa5323ef8eb9ac49ac3c4f00d591a8d2246fe34f6ab0dfadad87738a": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x7ff69151ae19f6233fe8aaa04ab443f2b9479fc0ab4a6c38b2a1a82575e3b834": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xeb61fa5a51b5c39dd608fb5a921348d3df15f2ce8c87d394d72b78d64387b217": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x584fda5868cbb23543b6209581e7a357fb5da4572dd3d304ea212edb597ee33f": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x5bdfbc3deebfd6f93f0e9091698c98dc6ecfefd3ca651994768344157a6777c2": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x75a964848f5a73d561fdf33e0fd7723e17b732f1b36f73a011c69ebd3b4a96de": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x4b7cc7dfc04001d290a77097aced8ac8aeab9d8773974285c5fd3785d5bda31c": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xe5d3caa4937f2b8f21ad59b60b54e218d880d8b553f6df1ee7400e26e2152568": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x9bb158c02026497d7e939552f0053370f9b6f9a6e18169d415f1a5cf4615da5d": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xccfbd08005b654b98eddea1e397bb3bfd6b052d859e1e039d2f1394b4fdcafb6": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x58a7b935b0db7ec81ac202f0b7f4d283884529ad6a85dbba606e27440a9886c0": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xb8da11e7407e6717c8edd2a29b6a886e6e0e216cd67bb8012c6ce8b2c3fc5eec": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xbbbc720944d8b4aff89cc132129510aff02da9341e5c314d4d37836432bf72aa": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x40860ed51f5caf441a5f2ccb1bcaeb1cbbbb967e2b2d442d77c23a7fd63760fc": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x21ce31a0aff84209e8fbc7453a342ce93420b4712fcd285fb635c1385d7b91b8": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xd8973a39f5a008b6939c7f9755e40ed0dec169d1a6cba87f469898d7a7f1ec76": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0x05be9c6a1e249dfa1591dff3b9c962297fdca0578667247071729cc25eb7bb2a": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xb097450785614b697715b9680e3cc65aee3996405509cc870cca6703bacaecd3": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xc2b36de14516e35a72eb62ecf50fedde5a80a00d55561d7ffa56c23ecbf34210": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xed036ae4ab73a81a095e5bb060c7fecdf9547afa34e93d093ea18bd499ccc455": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x9cc85e744b0077fbe4c1f4ca42e8846b987a51fd68849ada9e0fdf79fa273cb9": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
   }
 }
