@@ -223,7 +223,7 @@ contract Meritocracy {
                 c.received = 0;
                 c.allocation = 0;
                 // WARN: Should totalReceived and totalForfeited be zeroed-out? 
-                ERC20Token(token).transferFrom(address(this), c.addr, r);
+                ERC20Token(token).transferFrom(address(this), c.addr, r); // Transfer any owed tokens to contributor 
         }
         lastForfeit = block.timestamp;
         token = _token;

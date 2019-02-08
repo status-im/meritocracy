@@ -102,7 +102,11 @@ contract("Meritocracy", function () {
     assert.strictEqual(parseInt(contributor.allocation), individualAllocation); // 333
 });
 
+  // TODO Addadmin
+  // TODO RemoveAdmin
+
   it("maxContributor + 1 fails", async function () {
+    // TODO change so admin adds them
     var result;
     let contributorCount = 3;
     let additionalContributorsToMax = 7;
@@ -119,15 +123,20 @@ contract("Meritocracy", function () {
     }
   });
 
+  // TODO award
+  // TODO withdraw before and after
 
-  // it("set storage value", async function () {
-  //   await Meritocracy.methods.set(150).send();
-  //   let result = await SimpleStorage.methods.get().call();
-  //   assert.strictEqual(parseInt(result, 10), 150);
-  // });
+  // TODO forfeitAllocations
 
-  // it("should have account with balance", async function() {
-  //   let balance = await web3.eth.getBalance(accounts[0]);
-  //   assert.ok(parseInt(balance, 10) > 0);
-  // });
+  // TODO withdraw after forfeitAllocations 
+
+ // TODO setMaxContributors smaller than max
+ // TODO removeContributors
+ // TODO setMaxContributors again
+ // TODO addContributors
+ // TODO changeOwner
+
+ // TODO escape
+ // TODO changeToken
+  // TODO escape overload?
 });
