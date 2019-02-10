@@ -12,6 +12,11 @@ DApp:
 - allows you to send SNT to meritocracy
 - add/remove contributor
 - add/remove adminstrator
+
+Extension:
+- Command:
+    - above command = display allocation, received, withdraw button, allocate button? (might be better in dapp)
+    - /kudos 500 "<person>" "<praise>"
 */
 
 import "token/ERC20Token.sol";
@@ -35,7 +40,7 @@ contract Meritocracy {
         Status[] status;
     }
 
-    address public token; // token contract
+    ERC20Token public token; // token contract
     address payable public owner; // contract owner
     uint256 public lastForfeit; // timestamp to block admins calling forfeitAllocations too quickly
     address[] public registry; // array of contributor addresses
@@ -43,16 +48,30 @@ contract Meritocracy {
     mapping(address => bool) public admins;
     mapping(address => Contributor) public contributors;
 
+    // Modifiers -------------------------------------------------------------------------------------------------
+
+    // Functions only Owner can call
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    // Functions only Admin can call
+    modifier onlyAdmin() {
+        require(admins[msg.sender]);
+        _;
+    }
+
     // Open Functions  ----------------------------------------------------------------------------------------
 
-    // Split amount over each contributor in registry, anyone can contribute.
+    // Split amount over each contributor in registry, any contributor can allocate? TODO maybe relax this restriction, so anyone can allocate tokens
     function allocate(uint256 _amount) external {
         // Locals
         uint256 individualAmount;
-        Contributor memory cAllocator = contributors[msg.sender];
+        // Contributor memory cAllocator = contributors[msg.sender];
         // Requirements
-        require(cAllocator.addr == msg.sender); // is sender a Contributor?
-        require(ERC20Token(token).transferFrom(msg.sender, address(this), _amount));
+        // require(cAllocator.addr != address(0)); // is sender a Contributor? TODO maybe relax this restriction.
+        require(token.transferFrom(msg.sender, address(this), _amount));
         // Body
         // cAllocator.inPot = true;
         individualAmount = _amount / registry.length;
@@ -62,7 +81,7 @@ contract Meritocracy {
     }
 
     // Getter for Dynamic Array Length
-    function registryLength() external returns (uint256) {
+    function registryLength() public view returns (uint256) {
         return registry.length;
     }
 
@@ -81,7 +100,7 @@ contract Meritocracy {
         uint256 r = cReceiver.received;
         cReceiver.received = 0;
         // cReceiver.inPot = false;
-        ERC20Token(token).transferFrom(address(this), cReceiver.addr, r);
+        token.transferFrom(address(this), cReceiver.addr, r);
     }
 
     // Allow Contributors to award allocated tokens to other Contributors
@@ -112,11 +131,10 @@ contract Meritocracy {
     // Admin Functions  -------------------------------------------------------------------------------------
 
     // Add Contributor to Registry
-    function addContributor(address _contributor) public {
+    function addContributor(address _contributor) public onlyAdmin() {
         // Requirements
-        require(admins[msg.sender]);
-        require(registry.length + 1 <= maxContributors);
-        require(contributors[_contributor].addr == address(0));
+        require(registry.length + 1 <= maxContributors); // Don't go out of bounds
+        require(contributors[_contributor].addr == address(0)); // Contributor doesn't exist
         // Body
         Contributor storage c = contributors[_contributor];
         c.addr = _contributor;
@@ -124,9 +142,9 @@ contract Meritocracy {
     }
 
     // Add Multiple Contributors to the Registry in one tx
-    function addContributors(address[] calldata _newContributors ) external {
+    function addContributors(address[] calldata _newContributors ) external onlyAdmin() {
         // Requirements
-        require(registry.length + _newContributors.length <= maxContributors);
+        require(registry.length + _newContributors.length <= maxContributors); // Don't go out of bounds
         // Body
         for (uint256 i = 0; i < _newContributors.length; i++) {
                 addContributor(_newContributors[i]);
@@ -135,19 +153,19 @@ contract Meritocracy {
 
     // Remove Contributor from Registry
     // Note: Should not be easy to remove multiple contributors in one tx
-    function removeContributor(address _contributor) external {
+    // WARN: Changed to idx, client can do loop by enumerating registry
+    function removeContributor(uint256 idx) external onlyAdmin() { // address _contributor
         // Requirements
-        require(admins[msg.sender]);
+        require(idx < registry.length - 1); // idx needs to be smaller than registry.length - 1 OR maxContributors
         // Body
         // Find id of contributor address
-        uint256 idx = 0;
-        for (uint256 i = 0; i < registry.length; i++) { // should never be longer than maxContributors, see addContributor
-                if (registry[i] == _contributor) {
-                    idx = i;
-                    break;
-                }
-        }
-
+        // uint256 idx = 0;
+        // for (uint256 i = 0; i < registry.length; i++) { // should never be longer than maxContributors, see addContributor
+        //         if (registry[i] == _contributor) {
+        //             idx = i;
+        //             break;
+        //         }
+        // }
         address c = registry[idx];
         // Swap & Pop!
         registry[idx] = registry[registry.length - 1];
@@ -156,18 +174,14 @@ contract Meritocracy {
     }
 
     // Implictly sets a finite limit to registry length
-    function setMaxContributors(uint256 _maxContributors) external {
-        // Requirements
-        require(admins[msg.sender]);
+    function setMaxContributors(uint256 _maxContributors) external onlyAdmin() {
         require(_maxContributors > registry.length); // have to removeContributor first
         // Body
         maxContributors = _maxContributors;
     }
 
     // Zero-out allocations for contributors, minimum once a week, if allocation still exists, add to burn
-    function forfeitAllocations() public {
-        // Requirements
-        require(admins[msg.sender]);
+    function forfeitAllocations() public onlyAdmin() {
         require(block.timestamp >= lastForfeit + 1 weeks); // prevents multiple admins accidently calling too quickly.
         // Body
         lastForfeit = block.timestamp; 
@@ -183,25 +197,17 @@ contract Meritocracy {
     // Owner Functions  -------------------------------------------------------------------------------------
 
     // Set Admin flag for address to true
-    function addAdmin(address _admin) public {
-        // Requirements
-        require(msg.sender == owner);
-        // Body
+    function addAdmin(address _admin) public onlyOwner() {
         admins[_admin] = true;
     }
 
     //  Set Admin flag for address to false
-    function removeAdmin(address _admin) public {
-        // Requirements
-        require(msg.sender == owner);
-        // Body
+    function removeAdmin(address _admin) public onlyOwner() {
         delete admins[_admin];
     }
 
     // Change owner address, ideally to a management contract or multisig
-    function changeOwner(address payable _owner) external {
-        // Requirements
-        require(msg.sender == owner);
+    function changeOwner(address payable _owner) external onlyOwner() {
         // Body
         removeAdmin(owner);
         addAdmin(_owner);
@@ -210,41 +216,34 @@ contract Meritocracy {
 
     // Change Token address
     // WARN: call escape first, or escape(token);
-    function changeToken(address _token) external {
-        // Locals
-        uint256 r;
-        // Requirements
-        require(msg.sender == owner);
+    function changeToken(address _token) external onlyOwner() {
         // Body
         // Zero-out allocation and received, send out received tokens before token switch.
         for (uint256 i = 0; i < registry.length; i++) {
                 Contributor storage c = contributors[registry[i]];
-                r =  c.received;
+                uint256 r =  c.received;
                 c.received = 0;
                 c.allocation = 0;
                 // WARN: Should totalReceived and totalForfeited be zeroed-out? 
-                ERC20Token(token).transferFrom(address(this), c.addr, r); // Transfer any owed tokens to contributor 
+                token.transferFrom(address(this), c.addr, r); // Transfer any owed tokens to contributor 
         }
         lastForfeit = block.timestamp;
-        token = _token;
+        token = ERC20Token(_token);
     }
 
     // Failsafe, Owner can escape hatch all Tokens and ETH from Contract.
-    function escape() public {
-        // Requirements
-        require(msg.sender == owner);
+    function escape() public onlyOwner() {
         // Body
-        ERC20Token(token).transferFrom(address(this), owner,  ERC20Token(token).balanceOf(address(this)));
-        address(owner).transfer(address(this).balance);
+        token.transferFrom(address(this), owner,  token.balanceOf(address(this)));
+        owner.transfer(address(this).balance);
     }
 
     // Overloaded failsafe function, recourse incase changeToken is called before escape and funds are in a different token
     // Don't want to require in changeToken incase bad behaviour of ERC20 token
-    function escape(address _token) external {
-        // Requirements
-        require(msg.sender == owner);
+    function escape(address _token) external onlyOwner() {
         // Body
-        ERC20Token(_token).transferFrom(address(this), owner,  ERC20Token(_token).balanceOf(address(this)));
+        ERC20Token t = ERC20Token(_token);
+        t.transferFrom(address(this), owner,  t.balanceOf(address(this)));
         escape();
     }
 
@@ -254,9 +253,7 @@ contract Meritocracy {
         owner = msg.sender;
         addAdmin(owner);
         lastForfeit = block.timestamp;
-        token = _token;
+        token = ERC20Token(_token);
         maxContributors= _maxContributors;
     }
-
-    // function() public { throw; } // TODO Probably not needed?
 }

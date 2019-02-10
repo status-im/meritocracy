@@ -702,5 +702,53 @@
         "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
       }
     }
+  },
+  "0x49d86540d21be243d6b35ac3d57a70a706f7deb3bb86ef077f4284cd96c49996": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0xdbb86398e138a56d6f9aedadef62d41d99e5a3c6a39d64605ec1e4ad2ed03552": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xafffa90a8bde013ecfaa2f52c9e3a91cec80efb2bf21a11aa6322dd14cdcff9f": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0xdbb86398e138a56d6f9aedadef62d41d99e5a3c6a39d64605ec1e4ad2ed03552": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xb78c5af6ccf56c3a3467561d3ae57a6446fd2239d3b1ad07cc6c9a0bd0a865d2": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x78671fa87a2081dd20332ebf134a0e2dab79f47bfe878fb8911921d78dbad054": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
   }
 }
