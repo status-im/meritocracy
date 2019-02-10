@@ -750,5 +750,37 @@
         "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
       }
     }
+  },
+  "0x434aba1e9737c8527b5514ba9b1dbd2330705ce02243cb119510c11668159714": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x2b62fb48a19b53e76d5137574f996db9188d511227d1971c3997820ecdbe9d04": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
+  },
+  "0xed91b3f34bf33b1fd575587cbdf56f3cf146d6d01942680ec63207f3de1fb8ba": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x2b62fb48a19b53e76d5137574f996db9188d511227d1971c3997820ecdbe9d04": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
   }
 }

@@ -48,7 +48,7 @@ contract Meritocracy {
     mapping(address => bool) public admins;
     mapping(address => Contributor) public contributors;
 
-    // Modifiers -------------------------------------------------------------------------------------------------
+    // Modifiers --------------------------------------------------------------------------------------------
 
     // Functions only Owner can call
     modifier onlyOwner() {
@@ -62,7 +62,7 @@ contract Meritocracy {
         _;
     }
 
-    // Open Functions  ----------------------------------------------------------------------------------------
+    // Open Functions  --------------------------------------------------------------------------------------
 
     // Split amount over each contributor in registry, any contributor can allocate? TODO maybe relax this restriction, so anyone can allocate tokens
     function allocate(uint256 _amount) external {
@@ -85,7 +85,7 @@ contract Meritocracy {
         return registry.length;
     }
 
-    // Contributor Functions -------------------------------------------------------------------------------
+    // Contributor Functions --------------------------------------------------------------------------------
 
     // Allows a contributor to withdraw their received Token, when their allocation is 0
     function withdraw() external {
@@ -143,10 +143,12 @@ contract Meritocracy {
 
     // Add Multiple Contributors to the Registry in one tx
     function addContributors(address[] calldata _newContributors ) external onlyAdmin() {
+        // Locals
+        uint256 newContributorLength = _newContributors.length;
         // Requirements
-        require(registry.length + _newContributors.length <= maxContributors); // Don't go out of bounds
+        require(registry.length + newContributorLength <= maxContributors); // Don't go out of bounds
         // Body
-        for (uint256 i = 0; i < _newContributors.length; i++) {
+        for (uint256 i = 0; i < newContributorLength; i++) {
                 addContributor(_newContributors[i]);
         }
     }
@@ -155,20 +157,14 @@ contract Meritocracy {
     // Note: Should not be easy to remove multiple contributors in one tx
     // WARN: Changed to idx, client can do loop by enumerating registry
     function removeContributor(uint256 idx) external onlyAdmin() { // address _contributor
+        // Locals
+        uint256 registryLen = registry.length - 1;
         // Requirements
-        require(idx < registry.length - 1); // idx needs to be smaller than registry.length - 1 OR maxContributors
+        require(idx < registryLen); // idx needs to be smaller than registry.length - 1 OR maxContributors
         // Body
-        // Find id of contributor address
-        // uint256 idx = 0;
-        // for (uint256 i = 0; i < registry.length; i++) { // should never be longer than maxContributors, see addContributor
-        //         if (registry[i] == _contributor) {
-        //             idx = i;
-        //             break;
-        //         }
-        // }
         address c = registry[idx];
         // Swap & Pop!
-        registry[idx] = registry[registry.length - 1];
+        registry[idx] = registry[registryLen];
         registry.pop();
         delete contributors[c]; // TODO check if this works
     }
@@ -182,11 +178,13 @@ contract Meritocracy {
 
     // Zero-out allocations for contributors, minimum once a week, if allocation still exists, add to burn
     function forfeitAllocations() public onlyAdmin() {
+        // Locals
+        uint256 registryLen = registry.length;
+        // Requirements
         require(block.timestamp >= lastForfeit + 1 weeks); // prevents multiple admins accidently calling too quickly.
         // Body
         lastForfeit = block.timestamp; 
-        
-        for (uint256 i = 0; i < registry.length; i++) { // should never be longer than maxContributors, see addContributor
+        for (uint256 i = 0; i < registryLen; i++) { // should never be longer than maxContributors, see addContributor
                 Contributor storage c = contributors[registry[i]];
                 c.totalForfeited += c.allocation; // Shaaaaame!
                 c.allocation = 0;
@@ -247,7 +245,9 @@ contract Meritocracy {
         escape();
     }
 
-    // Set Token address and initial maxContributors
+    // Constructor ------------------------------------------------------------------------------------------
+
+    // Set Owner, Token address and initial maxContributors
     constructor(address _token, uint256 _maxContributors) public {
         // Body
         owner = msg.sender;
