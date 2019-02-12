@@ -102,6 +102,7 @@ class App extends React.Component {
               placeholder="Choose Contributor(s)..."
             />
             <input value="bsadsad" placeholder="Enter your praise..." />
+            <span> Total Award: 450 </span> 
           <Button variant="outline-primary">Allocate</Button>
         </Tab>
         <Tab eventKey={2} title={this._renderStatus('Admins', true)}>
