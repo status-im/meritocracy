@@ -80,6 +80,10 @@
       "0xc2fcb69e0c06e6b612c9773971f962b871d8f10abcbe5752c2b21f2222e7d043": {
         "name": "Meritocracy",
         "address": "0x3b09228F1C2e5242Af9681D2854AeA3A112105d2"
+      },
+      "0x1411ee9f114a60cef8802a53ea89c2640c01fba8139488cbeccde02c58fea5e6": {
+        "name": "Meritocracy",
+        "address": "0x7D1Ac123Ffdf90f911343cb7FeDd3902caC303B6"
       }
     }
   },

@@ -93,7 +93,7 @@ class App extends React.Component {
           <span>Your Allocation: 500</span>
           <span>Your Award: 500 <Button variant="outline-primary">Withdraw</Button></span>
           
-          <NumericInput mobile step={5} />
+          <NumericInput mobile step={5} min={0} />
           <Select
               isMulti
               defaultValue={selectedOption}
@@ -101,11 +101,14 @@ class App extends React.Component {
               options={options}
               placeholder="Choose Contributor(s)..."
             />
-            <input value="bsadsad" />
+            <input value="bsadsad" placeholder="Enter your praise..." />
           <Button variant="outline-primary">Allocate</Button>
         </Tab>
         <Tab eventKey={2} title={this._renderStatus('Admins', true)}>
            <div>lol</div>
+        </Tab>
+        <Tab eventKey={3} title={this._renderStatus('Leaderboard', true)}>
+           <div>¯\_(ツ)_/¯</div>
         </Tab>
       </Tabs>
     </div>);

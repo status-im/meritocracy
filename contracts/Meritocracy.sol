@@ -118,6 +118,7 @@ contract Meritocracy {
         Contributor storage cSender = contributors[msg.sender];
         Contributor storage cReceiver = contributors[_contributor];
         // Requirements
+        require(_amount > 0); // Allow Non-Zero amounts only
         require(cSender.addr == msg.sender); // Ensure Contributors both exist, and isn't the same address 
         require(cReceiver.addr == _contributor);
         require(cSender.addr != cReceiver.addr); // cannot send to self

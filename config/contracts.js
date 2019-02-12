@@ -75,7 +75,7 @@ module.exports = {
           {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
           ]
     },
-"afterDeploy": ["SNT.methods.generateTokens('$accounts[0]', '100000000000000000000').send()"]
+    "afterDeploy": ["SNT.methods.generateTokens('$accounts[0]', '100000000000000000000').send()"]
   },
 
   // merges with the settings in default
