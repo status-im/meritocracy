@@ -4,6 +4,8 @@ pragma solidity ^0.5.0;
 Future Goals:
 - remove admins necessity
 - encourage contributors to allocate
+- needs incentive for someone to call forfeit
+- read from previous versions of the script
 
 DApp:
 - show tokens to allocate
@@ -47,6 +49,8 @@ contract Meritocracy {
     uint256 public maxContributors; // Dynamic finite limit on registry.
     mapping(address => bool) public admins;
     mapping(address => Contributor) public contributors;
+
+    Meritocracy public previousMeritocracy; // Reference and read from previous contract
 
     // Modifiers --------------------------------------------------------------------------------------------
 
@@ -102,6 +106,11 @@ contract Meritocracy {
         // cReceiver.inPot = false;
         token.transferFrom(address(this), cReceiver.addr, r);
     }
+
+    // TODO: for different UI
+    // function awardMultipleContributors ( address[][2] _contributors ) external {
+
+    // }
 
     // Allow Contributors to award allocated tokens to other Contributors
     function award(address _contributor, uint256 _amount,  string calldata _praise) external {
@@ -181,7 +190,7 @@ contract Meritocracy {
         // Locals
         uint256 registryLen = registry.length;
         // Requirements
-        require(block.timestamp >= lastForfeit + 1 weeks); // prevents multiple admins accidently calling too quickly.
+        require(block.timestamp >= lastForfeit + 1 weeks); // prevents admins accidently calling too quickly.
         // Body
         lastForfeit = block.timestamp; 
         for (uint256 i = 0; i < registryLen; i++) { // should never be longer than maxContributors, see addContributor
@@ -245,9 +254,21 @@ contract Meritocracy {
         escape();
     }
 
+    // Housekeeping -----------------------------------------------------------------------------------------
+
+    // function importPreviousMeritocracyData() private onlyOwner() { // onlyOwner not explicitly needed but safer than sorry, it's problem with overloaded function
+    //      // if previousMeritocracy != address(0) { // TODO better truthiness test, casting?
+    //      //        // Do Stuff
+    //      // }
+    // }
+
     // Constructor ------------------------------------------------------------------------------------------
 
-    // Set Owner, Token address and initial maxContributors
+    // constructor(address _token, uint256 _maxContributors, address _previousMeritocracy) public {
+        
+    // }
+
+    // Set Owner, Token address,  initial maxContributors
     constructor(address _token, uint256 _maxContributors) public {
         // Body
         owner = msg.sender;
@@ -255,5 +276,7 @@ contract Meritocracy {
         lastForfeit = block.timestamp;
         token = ERC20Token(_token);
         maxContributors= _maxContributors;
+        // previousMeritocracy = Meritocracy(_previousMeritocracy);
+        // importPreviousMeritocracyData() TODO
     }
 }

@@ -5,25 +5,21 @@ module.exports = {
     deployment: {
       host: "localhost", // Host of the blockchain node
       port: 8545, // Port of the blockchain node
-      type: "rpc" // Type of connection (ws or rpc),
+      type: "rpc", // Type of connection (ws or rpc),
       // Accounts to use instead of the default account to populate your wallet
-      /*,accounts: [
-        {
-          privateKey: "your_private_key",
-          balance: "5 ether"  // You can set the balance of the account in the dev environment
-                              // Balances are in Wei, but you can specify the unit with its name
-        },
-        {
-          privateKeyFile: "path/to/file", // Either a keystore or a list of keys, separated by , or ;
-          password: "passwordForTheKeystore" // Needed to decrypt the keystore file
-        },
-        {
-          mnemonic: "12 word mnemonic",
-          addressIndex: "0", // Optionnal. The index to start getting the address
-          numAddresses: "1", // Optionnal. The number of addresses to get
-          hdpath: "m/44'/60'/0'/0/" // Optionnal. HD derivation path
-        }
-      ]*/
+        accounts: [
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          ]
     },
     // order of connections the dapp should connect to
     dappConnection: [
@@ -66,15 +62,18 @@ module.exports = {
     deployment: {
       // The order here corresponds to the order of `web3.eth.getAccounts`, so the first one is the `defaultAccount`
       accounts: [
-        {
-          nodeAccounts: true
-        },
-        {
-          mnemonic: "foster gesture flock merge beach plate dish view friend leave drink valley shield list enemy",
-          balance: "5 ether",
-          numAddresses: "10"
-        }
-      ]
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          {  "mnemonic": "12 word mnemonic", "balance": "5 ether"  },
+          ]
     },
 "afterDeploy": ["SNT.methods.generateTokens('$accounts[0]', '100000000000000000000').send()"]
   },

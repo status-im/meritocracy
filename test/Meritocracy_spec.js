@@ -120,6 +120,7 @@ contract("Meritocracy", function () {
       assert.fail('should have reverted');
     } catch (error) {
       assert.strictEqual(error.message, "VM Exception while processing transaction: revert");
+      throw error;
     }
   });
 
