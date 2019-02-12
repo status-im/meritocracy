@@ -790,5 +790,21 @@
         "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
       }
     }
+  },
+  "0x19e9af8eb3780d5cf63633ebddc5f9e7b994ee155147562f24a7a521541736d3": {
+    "contracts": {
+      "0xe5413cb03538126884d14df481da47efdeba969bd6c7e3609abaf1dc42973b1a": {
+        "name": "MiniMeTokenFactory",
+        "address": "0x7078E9E73FeFf15eC5C4C58233adc19447719979"
+      },
+      "0x1dc86cbe444c7243c6565fc68d02a9a0623e97a7d9470f1debede7951c2acb37": {
+        "name": "SNT",
+        "address": "0x195fcB5B1D04E58C90813a5d67a5Ab84Bc4D85e5"
+      },
+      "0x303aabe1cc76d9f9b44f0fa6d2b591caad9d8ca9f68e93b4c29cb7032325c454": {
+        "name": "Meritocracy",
+        "address": "0x9c888ff4D7d4F512C79073ad5016116327fD8315"
+      }
+    }
   }
 }
