@@ -124,13 +124,8 @@ contract Meritocracy {
         emit ContributorWithdrew(cReceiver.addr);
     }
 
-    // TODO: for different UI
-    // function awardMultipleContributors ( address[][2] _contributors ) external {
-
-    // }
-
     // Allow Contributors to award allocated tokens to other Contributors
-    function award(address _contributor, uint256 _amount,  string calldata _praise) external {
+    function award(address _contributor, uint256 _amount,  string memory _praise) public {
         // Locals
         Contributor storage cSender = contributors[msg.sender];
         Contributor storage cReceiver = contributors[_contributor];
@@ -154,6 +149,20 @@ contract Meritocracy {
 
         cReceiver.status.push(s); // Record the history
         emit ContributorTransaction(cSender.addr, cReceiver.addr);
+    }
+
+    // Allow Contributor to award multiple Contributors 
+    function awardContributors(address[] calldata _contributors, uint256 _amountEach,  string calldata _praise) external {
+        // Locals
+        Contributor storage cSender = contributors[msg.sender];
+        uint256 contributorsLength = _contributors.length;
+        uint256 totalAmount = contributorsLength * _amountEach;
+        // Requirements
+        require(cSender.allocation >= totalAmount);
+        // Body
+        for (uint256 i = 0; i < contributorsLength; i++) {
+                award(_contributors[i], _amountEach, _praise);
+        }
     }
 
     // Admin Functions  -------------------------------------------------------------------------------------

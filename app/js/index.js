@@ -14,15 +14,13 @@ import Meritocracy from 'Embark/contracts/Meritocracy';
 
 /*
 TODO:
-- approve & allocate SNT
-- withdraw SNT
 - list praise for contributor
 - listen to events to update UI, (initially on page load but within function calls)
 */
 
 // Todo Resolve ENS entries
 const options = [
-{ 'label' : 'Jarrad (Test)', 'value' : '0xe5d882a925D9c4de439d2a109D0a0Bd5250E776F' },
+{ 'label' : 'Jarrad (Test)', 'value' : '0x926495cf9510174080ef2f7931242e85c0de2af8' },
 { 'label' : 'Andreas S.', 'value' : '0x4923121411e884a4af66ec025712eba600a782d3' }, 
 { 'label' : 'andrey.dev', 'value' : '0xA4EcA293cb578a68b190e3e07c2B170dc753fe44' }, 
 { 'label' : 'barry', 'value' : '0xa46b0546481a04b7de049a8a20f8a9b2b2c5cc05' }, 
@@ -75,6 +73,9 @@ class App extends React.Component {
 
     this.handleContributorSelection = this.handleContributorSelection.bind(this);
     this.handleAwardChange = this.handleAwardChange.bind(this);
+    this.handlePraiseChange = this.handlePraiseChange.bind(this);
+    this.awardTokens = this.awardTokens.bind(this);
+    this.withdrawTokens = this.withdrawTokens.bind(this);
 
     this.state = {
       error: null,
@@ -86,7 +87,8 @@ class App extends React.Component {
       selectedContributors: [],
       contributorList: [], // TODO: Merge these data structures?
       contributorData: {},
-      award: 0
+      award: 0,
+      praise: ''
     };
   }
 
@@ -97,7 +99,7 @@ class App extends React.Component {
        return this.setState({error: err.message || err});
       }
 
-      console.log(web3.eth.defaultAccount);
+      // console.log(web3.eth.defaultAccount);
       var contributorData = {};
       contributorData[web3.eth.defaultAccount] = {
         allocation: 0,
@@ -108,19 +110,7 @@ class App extends React.Component {
       };
       this.setState({contributorData: contributorData, defaultAccount : web3.eth.defaultAccount });
 
-      // this.getRegistry();
       this.getContributors();
-
-      // Meritocracy.methods.registryLength().call().then(_value => {
-      //   let length = parseInt(_value);
-      //   this.setState({ registryLength:  length });
-
-      //   for(var i=0; i < length; i++) {
-      //       // Meritocracy.methods.registryLength().call().then(_value => {
-      //       // });
-      //   }
-      //  });  
-
     });
   }
 
@@ -136,22 +126,31 @@ class App extends React.Component {
     console.log(`handleAwardChange:`, amount);
   }
 
+  handlePraiseChange(e) {
+    this.setState({ praise: e.target.value });
+  }
+
   getContributor(_address) {
     Meritocracy.methods.contributors(_address).call().then(_contributor => {
       var contributorData = this.state.contributorData;
       contributorData[_contributor.addr.toLowerCase()] = _contributor; // Lowercase here incase we use keys for <Select />
       console.log(_contributor);
       this.setState({ contributorData : contributorData });
+      this.forceUpdate() // ... 
     });
   }
 
   getContributors() {
     Meritocracy.methods.getRegistry().call().then(_registry => {
 
-      // This block is probably not needed if can use contributorData keys
+      // This block is probably not needed if can use contributorData keys in <Select />
       let registry = _registry.map(Function.prototype.call, String.prototype.toLowerCase);
       let contributorList = options.filter(_e => {
             if (registry.includes(_e.value.toLowerCase())) return _e;
+            // TODO resolve ENS names
+              //             EmbarkJS.Names.resolve("ethereum.eth").then(address => {
+              //   console.log("the address for ethereum.eth is: " + address);
+              // })
       });
       this.setState({ contributorList : contributorList });
 
@@ -160,6 +159,73 @@ class App extends React.Component {
             this.getContributor(_registry[i]);
       }
     });
+  }
+
+  awardTokens(e) {
+    let  currentContributor = this.state.contributorData[this.state.defaultAccount];
+
+    // TODO some sanity checks
+    if(this.state.award <= 0) {
+      console.log('amount must be more than 0');
+      return;
+    }
+
+
+    let addresses = this.state.selectedContributors.map(a => a.value);
+
+    switch(addresses.length) {
+      case 0:
+        console.log('No Contributor Selected');
+        return;
+      case 1:
+        // use award
+        console.log('use award');
+       
+        try {
+          Meritocracy.methods.award(addresses[0], this.state.award, this.state.praise).send().then(_contributor => {
+            getContributor(this.state.defaultAccount);
+          });
+        } catch(e) {
+          console.log('tx failed? got enough tokens to award?');
+        }
+        break;
+      default:
+        // use awardContributors
+        console.log('using awardContributors');
+
+        try {
+          Meritocracy.methods.awardContributors(addresses, this.state.award, this.state.praise).send().then(_contributor => {
+            getContributor(this.state.defaultAccount);
+          });
+        } catch(e) {
+          console.log('tx failed? got enough tokens to award?');
+        }
+        break;
+    }
+  }
+
+  withdrawTokens(e) {
+
+    console.log('withdrawTokens');
+    let  currentContributor = this.state.contributorData[this.state.defaultAccount];
+
+    if (currentContributor.received == 0) {
+      console.log('can only call withdraw when you have tokens');
+      return;
+    }
+
+    if ( currentContributor.allocation > 0 ) {
+      console.log('you must allocate all your tokens');
+      return;
+    }
+
+    try {
+      Meritocracy.methods.withdraw().send().then(_contributor => {
+        getContributor(this.state.defaultAccount);
+      });
+    } catch(e) {
+      console.log('tx failed? Did you allocate all your tokens first?');
+    }
   }
 
   render() {
@@ -173,7 +239,7 @@ class App extends React.Component {
 
     if(!defaultAccount) return (<div>Cannot Find web3.eth.defaultAccount</div>);
     const currentContributor = contributorData[defaultAccount];
-
+    console.log('currentContributor.allocation', defaultAccount, currentContributor.allocation);
     return (<div>
       <h3>Status Meritocracy</h3>
      
@@ -194,13 +260,13 @@ class App extends React.Component {
 
             <NumericInput mobile step={5} min={0} max={currentContributor.allocation / selectedContributors.length } onChange={this.handleAwardChange} defaultValue={award} />  <br/>
 
-            <input placeholder="Enter your praise..." />  <br/>
-            <span> Total Allocating: {award * selectedContributors.length} SNT </span>   <br/>
-          <Button variant="outline-primary">Allocate</Button>
+            <input placeholder="Enter your praise..."  onChange={this.handlePraiseChange}/>  <br/>
+            <span> Total Awarding: {award * selectedContributors.length} SNT </span>   <br/>
+          <Button variant="outline-primary"  onClick={this.awardTokens}>Award</Button>
 
-          <h4>Awarded Kudos</h4>
+          <h4>Your Kudos History</h4>
 
-          <span>Your Received Kudos: { currentContributor.received } SNT <Button variant="outline-primary">Withdraw</Button></span>  <br/>
+          <span>Your Received Kudos: { currentContributor.received } SNT <Button variant="outline-primary"  onClick={this.withdrawTokens}>Withdraw</Button></span>  <br/>
           <Grid>
             <Row>
               <Col>0x00 has sent you 500 SNT "keep up the good work"</Col>

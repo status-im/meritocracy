@@ -1,6 +1,6 @@
 // this is also defined in index.js
 const options = [
-{ 'label' : 'Jarrad (Test)', 'value' : '0xe5d882a925D9c4de439d2a109D0a0Bd5250E776F' },
+{ 'label' : 'Jarrad (Test)', 'value' : '0x926495cf9510174080ef2f7931242e85c0de2af8' },
 { 'label' : 'Andreas S.', 'value' : '0x4923121411e884a4af66ec025712eba600a782d3' },  // commented because I already added to blockchain
 { 'label' : 'andrey.dev', 'value' : '0xA4EcA293cb578a68b190e3e07c2B170dc753fe44' }, 
 { 'label' : 'barry', 'value' : '0xa46b0546481a04b7de049a8a20f8a9b2b2c5cc05' }, 
@@ -153,8 +153,14 @@ module.exports = {
       ]
     },
     "afterDeploy": [
+      // Give Tokens to Meritocracy Owner
       "SNT.methods.generateTokens('$accounts[0]', '100000000000000000000').send()",
-      "Meritocracy.methods.addContributors([" + getContributors().toString() + "]).send()"
+      // Add All Contributors
+      "Meritocracy.methods.addContributors([" + getContributors().toString() + "]).send()",
+      // Allocate Owner Tokens
+      "SNT.methods.approve('$Meritocracy', 10000).send()",
+      "Meritocracy.methods.allocate(10000).send()"
+
     ]
 
   },
