@@ -6,6 +6,7 @@ const SNT = require('Embark/contracts/SNT');
 let accounts;
 let owner;
 let admins;
+let ownerInitTokens;
 
 // For documentation please see https://embark.status.im/docs/contracts_testing.html
 config({
@@ -47,6 +48,7 @@ config({
     }
   }
 }, (_err, web3_accounts) => {
+  console.log('dsdsdsds');
   accounts = web3_accounts;
   owner = accounts[0];
   admins = [accounts[0], accounts[1], accounts[2]];
@@ -54,7 +56,6 @@ config({
 });
 
 contract("Meritocracy", function () {
-  this.timeout(0);
 
   before(async () => {
     await SNT.methods.generateTokens(owner, ownerInitTokens).send();
@@ -72,7 +73,7 @@ contract("Meritocracy", function () {
 
   });
 
-  it("registryLength == 3, allocate(1000);", async function () {
+  it("registry.length == 3, allocate(1000);", async function () {
     var result;
     let allocationAmount = 1000;
     let contributorCount = 3;
@@ -84,8 +85,8 @@ contract("Meritocracy", function () {
       result = await Meritocracy.methods.addContributor(accounts[i]).send({from: owner});
       i++;
     }
-    let registryLength = await Meritocracy.methods.registryLength().call();
-    assert.strictEqual(parseInt(registryLength), contributorCount); // 3
+    let registry = await Meritocracy.methods.getRegistry().call(); // TODO check if this works
+    assert.strictEqual(parseInt(registry.length), contributorCount); // 3
 
     // Approve and allocate 1000 SNT for Meritocracy use
     result = await SNT.methods.approve(Meritocracy.address, allocationAmount).send({from: owner});

@@ -11,28 +11,55 @@ module.exports = {
                         // When set to "auto", Embark will automatically set the cors to the address of the webserver
     wsHost: "localhost", // WS-RPC server listening interface (default: "localhost")
     wsPort: 8546 // WS-RPC server listening port (default: 8546)
+
+    // Accounts to use as node accounts
+    // The order here corresponds to the order of `web3.eth.getAccounts`, so the first one is the `defaultAccount`
+    /*,accounts: [
+      {
+        nodeAccounts: true, // Accounts use for the node
+        numAddresses: "1", // Number of addresses/accounts (defaults to 1)
+        password: "config/development/devpassword" // Password file for the accounts
+      },
+      // Below are additional accounts that will count as `nodeAccounts` in the `deployment` section of your contract config
+      // Those will not be unlocked in the node itself
+      {
+        privateKey: "your_private_key"
+      },
+      {
+        privateKeyFile: "path/to/file", // Either a keystore or a list of keys, separated by , or ;
+        password: "passwordForTheKeystore" // Needed to decrypt the keystore file
+      },
+      {
+        mnemonic: "12 word mnemonic",
+        addressIndex: "0", // Optionnal. The index to start getting the address
+        numAddresses: "1", // Optionnal. The number of addresses to get
+        hdpath: "m/44'/60'/0'/0/" // Optionnal. HD derivation path
+      }
+    ]*/
   },
 
   // default environment, merges with the settings in default
   // assumed to be the intended environment by `embark run` and `embark blockchain`
   development: {
+    ethereumClientName: "geth", // Can be geth or parity (default:geth)
+    //ethereumClientBin: "geth",  // path to the client binary. Useful if it is not in the global PATH
     networkType: "custom", // Can be: testnet, rinkeby, livenet or custom, in which case, it will use the specified networkId
-    networkId: "1337", // Network id used when networkType is custom
+    networkId: 1337, // Network id used when networkType is custom
     isDev: true, // Uses and ephemeral proof-of-authority network with a pre-funded developer account, mining enabled
-    datadir: ".embark/development/datadir", // Data directory for the databases and keystore
+    datadir: ".embark/development/datadir", // Data directory for the databases and keystore (Geth 1.8.15 and Parity 2.0.4 can use the same base folder, till now they does not conflict with each other)
     mineWhenNeeded: true, // Uses our custom script (if isDev is false) to mine only when needed
     nodiscover: true, // Disables the peer discovery mechanism (manual peer addition)
     maxpeers: 0, // Maximum number of network peers (network disabled if set to 0) (default: 25)
     proxy: true, // Proxy is used to present meaningful information about transactions
     targetGasLimit: 8000000, // Target gas limit sets the artificial target gas floor for the blocks to mine
-    simulatorBlocktime: 0, // Specify blockTime in seconds for automatic mining. Default is 0 and no auto-mining.
+    simulatorBlocktime: 0 // Specify blockTime in seconds for automatic mining. Default is 0 and no auto-mining.
   },
 
   // merges with the settings in default
   // used with "embark run privatenet" and/or "embark blockchain privatenet"
   privatenet: {
     networkType: "custom",
-    networkId: "1337",
+    networkId: 1337,
     isDev: false,
     datadir: ".embark/privatenet/datadir",
     // -- mineWhenNeeded --
@@ -47,19 +74,40 @@ module.exports = {
     // -- genesisBlock --
     // This option is only valid when mineWhenNeeded is true (which is only valid if isDev is false).
     // When enabled, geth uses POW to mine transactions as it would normally, instead of using POA as it does in --dev mode.
-    // On the first `embark blockchain or embark run` after this option is enabled, geth will create a new chain with a 
+    // On the first `embark blockchain or embark run` after this option is enabled, geth will create a new chain with a
     // genesis block, which can be configured using the `genesisBlock` configuration option below.
     genesisBlock: "config/privatenet/genesis.json", // Genesis block to initiate on first creation of a development node
     nodiscover: true,
     maxpeers: 0,
     proxy: true,
-    account: {
-      // "address": "", // When specified, uses that address instead of the default one for the network
-      password: "config/privatenet/password" // Password to unlock the account
-    },
+    accounts: [
+      {
+        nodeAccounts: true,
+        password: "config/privatenet/password" // Password to unlock the account
+      }
+    ],
     targetGasLimit: 8000000,
-    wsHost: "localhost",
-    wsPort: 8546,
+    simulatorBlocktime: 0
+  },
+
+  privateparitynet: {
+    ethereumClientName: "parity",
+    networkType: "custom",
+    networkId: 1337,
+    isDev: false,
+    genesisBlock: "config/privatenet/genesis-parity.json", // Genesis block to initiate on first creation of a development node
+    datadir: ".embark/privatenet/datadir",
+    mineWhenNeeded: false,
+    nodiscover: true,
+    maxpeers: 0,
+    proxy: true,
+    accounts: [
+      {
+        nodeAccounts: true,
+        password: "config/privatenet/password"
+      }
+    ],
+    targetGasLimit: 8000000,
     simulatorBlocktime: 0
   },
 
@@ -68,9 +116,12 @@ module.exports = {
   testnet: {
     networkType: "testnet",
     syncMode: "light",
-    account: {
-      password: "config/testnet/password"
-    }
+    accounts: [
+      {
+        nodeAccounts: true,
+        password: "config/testnet/password"
+      }
+    ]
   },
 
   // merges with the settings in default
@@ -80,10 +131,13 @@ module.exports = {
     syncMode: "light",
     rpcCorsDomain: "http://localhost:8000",
     wsOrigins: "http://localhost:8000",
-    account: {
-      password: "config/livenet/password"
-    }
-  },
+    accounts: [
+      {
+        nodeAccounts: true,
+        password: "config/livenet/password"
+      }
+    ]
+  }
 
   // you can name an environment with specific settings and then specify with
   // "embark run custom_name" or "embark blockchain custom_name"

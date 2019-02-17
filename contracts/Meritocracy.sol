@@ -52,16 +52,33 @@ contract Meritocracy {
 
     Meritocracy public previousMeritocracy; // Reference and read from previous contract
 
+    // Events -----------------------------------------------------------------------------------------------
+
+    event ContributorAdded(address _contributor);
+    event ContributorRemoved(address _contributor);
+    event ContributorWithdrew(address _contributor);
+    event ContributorTransaction(address _cSender, address _cReceiver);
+
+    event AdminAdded(address _admin);
+    event AdminRemoved(address _admin);
+    event AllocationsForfeited();
+
+    event OwnerChanged(address _owner);
+    event TokenChanged(address _token);
+    event MaxContributorsChanged(uint256 _maxContributors);
+    event EscapeHatchTriggered(address _executor);
+
+
     // Modifiers --------------------------------------------------------------------------------------------
 
     // Functions only Owner can call
-    modifier onlyOwner() {
+    modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
 
     // Functions only Admin can call
-    modifier onlyAdmin() {
+    modifier onlyAdmin {
         require(admins[msg.sender]);
         _;
     }
@@ -84,9 +101,8 @@ contract Meritocracy {
         }
     }
 
-    // Getter for Dynamic Array Length
-    function registryLength() public view returns (uint256) {
-        return registry.length;
+    function getRegistry() public view returns (address[] memory) {
+        return registry;
     }
 
     // Contributor Functions --------------------------------------------------------------------------------
@@ -105,6 +121,7 @@ contract Meritocracy {
         cReceiver.received = 0;
         // cReceiver.inPot = false;
         token.transferFrom(address(this), cReceiver.addr, r);
+        emit ContributorWithdrew(cReceiver.addr);
     }
 
     // TODO: for different UI
@@ -136,12 +153,13 @@ contract Meritocracy {
         });
 
         cReceiver.status.push(s); // Record the history
+        emit ContributorTransaction(cSender.addr, cReceiver.addr);
     }
 
     // Admin Functions  -------------------------------------------------------------------------------------
 
     // Add Contributor to Registry
-    function addContributor(address _contributor) public onlyAdmin() {
+    function addContributor(address _contributor) public onlyAdmin {
         // Requirements
         require(registry.length + 1 <= maxContributors); // Don't go out of bounds
         require(contributors[_contributor].addr == address(0)); // Contributor doesn't exist
@@ -149,10 +167,11 @@ contract Meritocracy {
         Contributor storage c = contributors[_contributor];
         c.addr = _contributor;
         registry.push(_contributor);
+        emit ContributorAdded(_contributor);
     }
 
     // Add Multiple Contributors to the Registry in one tx
-    function addContributors(address[] calldata _newContributors ) external onlyAdmin() {
+    function addContributors(address[] calldata _newContributors ) external onlyAdmin {
         // Locals
         uint256 newContributorLength = _newContributors.length;
         // Requirements
@@ -166,65 +185,71 @@ contract Meritocracy {
     // Remove Contributor from Registry
     // Note: Should not be easy to remove multiple contributors in one tx
     // WARN: Changed to idx, client can do loop by enumerating registry
-    function removeContributor(uint256 idx) external onlyAdmin() { // address _contributor
+    function removeContributor(uint256 idx) external onlyAdmin { // address _contributor
         // Locals
-        uint256 registryLen = registry.length - 1;
+        uint256 registryLength = registry.length - 1;
         // Requirements
-        require(idx < registryLen); // idx needs to be smaller than registry.length - 1 OR maxContributors
+        require(idx < registryLength); // idx needs to be smaller than registry.length - 1 OR maxContributors
         // Body
         address c = registry[idx];
         // Swap & Pop!
-        registry[idx] = registry[registryLen];
+        registry[idx] = registry[registryLength];
         registry.pop();
         delete contributors[c]; // TODO check if this works
+        emit ContributorRemoved(c);
     }
 
     // Implictly sets a finite limit to registry length
-    function setMaxContributors(uint256 _maxContributors) external onlyAdmin() {
+    function setMaxContributors(uint256 _maxContributors) external onlyAdmin {
         require(_maxContributors > registry.length); // have to removeContributor first
         // Body
         maxContributors = _maxContributors;
+        emit MaxContributorsChanged(maxContributors);
     }
 
     // Zero-out allocations for contributors, minimum once a week, if allocation still exists, add to burn
-    function forfeitAllocations() public onlyAdmin() {
+    function forfeitAllocations() public onlyAdmin {
         // Locals
-        uint256 registryLen = registry.length;
+        uint256 registryLength = registry.length;
         // Requirements
         require(block.timestamp >= lastForfeit + 1 weeks); // prevents admins accidently calling too quickly.
         // Body
         lastForfeit = block.timestamp; 
-        for (uint256 i = 0; i < registryLen; i++) { // should never be longer than maxContributors, see addContributor
+        for (uint256 i = 0; i < registryLength; i++) { // should never be longer than maxContributors, see addContributor
                 Contributor storage c = contributors[registry[i]];
                 c.totalForfeited += c.allocation; // Shaaaaame!
                 c.allocation = 0;
                 // cReceiver.inPot = false; // Contributor has to put tokens into next round
         }
+        emit AllocationsForfeited();
     }
 
     // Owner Functions  -------------------------------------------------------------------------------------
 
     // Set Admin flag for address to true
-    function addAdmin(address _admin) public onlyOwner() {
+    function addAdmin(address _admin) public onlyOwner {
         admins[_admin] = true;
+        emit AdminAdded(_admin);
     }
 
     //  Set Admin flag for address to false
-    function removeAdmin(address _admin) public onlyOwner() {
+    function removeAdmin(address _admin) public onlyOwner {
         delete admins[_admin];
+        emit AdminRemoved(_admin);
     }
 
     // Change owner address, ideally to a management contract or multisig
-    function changeOwner(address payable _owner) external onlyOwner() {
+    function changeOwner(address payable _owner) external onlyOwner {
         // Body
         removeAdmin(owner);
         addAdmin(_owner);
         owner = _owner;
+        emit OwnerChanged(owner);
     }
 
     // Change Token address
     // WARN: call escape first, or escape(token);
-    function changeToken(address _token) external onlyOwner() {
+    function changeToken(address _token) external onlyOwner {
         // Body
         // Zero-out allocation and received, send out received tokens before token switch.
         for (uint256 i = 0; i < registry.length; i++) {
@@ -237,18 +262,20 @@ contract Meritocracy {
         }
         lastForfeit = block.timestamp;
         token = ERC20Token(_token);
+        emit TokenChanged(_token);
     }
 
     // Failsafe, Owner can escape hatch all Tokens and ETH from Contract.
-    function escape() public onlyOwner() {
+    function escape() public onlyOwner {
         // Body
         token.transferFrom(address(this), owner,  token.balanceOf(address(this)));
         owner.transfer(address(this).balance);
+        emit EscapeHatchTriggered(msg.sender);
     }
 
     // Overloaded failsafe function, recourse incase changeToken is called before escape and funds are in a different token
     // Don't want to require in changeToken incase bad behaviour of ERC20 token
-    function escape(address _token) external onlyOwner() {
+    function escape(address _token) external onlyOwner {
         // Body
         ERC20Token t = ERC20Token(_token);
         t.transferFrom(address(this), owner,  t.balanceOf(address(this)));
@@ -257,7 +284,7 @@ contract Meritocracy {
 
     // Housekeeping -----------------------------------------------------------------------------------------
 
-    // function importPreviousMeritocracyData() private onlyOwner() { // onlyOwner not explicitly needed but safer than sorry, it's problem with overloaded function
+    // function importPreviousMeritocracyData() private onlyOwner { // onlyOwner not explicitly needed but safer than sorry, it's problem with overloaded function
     //      // if previousMeritocracy != address(0) { // TODO better truthiness test, casting?
     //      //        // Do Stuff
     //      // }
