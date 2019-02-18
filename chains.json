@@ -1,21 +1,21 @@
 {
-  "0x888fb9ca9383ed8235e8a00cd21b2fb6e0302dd22dec12606496d5d77d23ccaf": {
+  "0x517c867f414bece4614c0d5e1c7ecb2f49c63595faf83baa96da62b81d80b33e": {
     "contracts": {
       "0xfb4295b67b9ca6e0992ff331dbd64c98b6cdb4bd896e033995691356b504077c": {
         "name": "ERC20Receiver",
-        "address": "0x914ae6A1b17F455f058bDc4d4010Bb7281BD47e2"
+        "address": "0x9957F3f6108f08eAcaAA52EE0A388560dc234034"
       },
       "0x6ef111d7ff114790dccb0eb991ffc66c0717516aa3cebfd356736581b75b0402": {
         "name": "MiniMeTokenFactory",
-        "address": "0xc6b47B0d1c1Ce88D4615Fe489469C2E914fAD841"
+        "address": "0x1427B7117ac465df9Ab0Af4a49E6700cCBed8283"
       },
-      "0x0b443399353a5650101ba464bd844ee95f00834b0b4931db54f8b4e16eed8c79": {
+      "0x1aa518db401ae87e1508c2317d56c9c44a5dacc66c7213b2cf68a254f7343ece": {
         "name": "SNT",
-        "address": "0xB2F001F37DA4D3a9d87eBD6Dc4325Aa82c2A83ad"
+        "address": "0xcA68f46036B31988b984f652C4DF0ed595B27916"
       },
-      "0x4ece53dda87e5f51d09fafe5ff4c2a6df503b7a04de12939a589024a9c2831a1": {
+      "0x6b5c2f810b3495761802ca0fa33feb653f921635d48315d416873bdab6d7158c": {
         "name": "Meritocracy",
-        "address": "0x19bD71805744B56234E4088B9ae390DF0A49480b"
+        "address": "0xC72783C18e87DDEB2DFB8858B39d22A03044E1f9"
       }
     }
   }

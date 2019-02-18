@@ -1,6 +1,6 @@
 // this is also defined in index.js
 const options = [
-{ 'label' : 'Jarrad (Test)', 'value' : '0x926495cf9510174080ef2f7931242e85c0de2af8' },
+{ 'label' : 'Jarrad (Test)', 'value' : '0x061b0227116e76025D5573cFbb1Ac854916286Fe' },
 { 'label' : 'Andreas S.', 'value' : '0x4923121411e884a4af66ec025712eba600a782d3' },  // commented because I already added to blockchain
 { 'label' : 'andrey.dev', 'value' : '0xA4EcA293cb578a68b190e3e07c2B170dc753fe44' }, 
 { 'label' : 'barry', 'value' : '0xa46b0546481a04b7de049a8a20f8a9b2b2c5cc05' }, 
@@ -135,9 +135,9 @@ module.exports = {
   // assumed to be the intended environment by `embark run`
   development: {
     dappConnection: [
+      "$WEB3",  // uses pre existing web3 object if available (e.g in Mist)
       "ws://localhost:8546",
       "http://localhost:8545",
-      "$WEB3"  // uses pre existing web3 object if available (e.g in Mist)
     ],
     deployment: {
       // The order here corresponds to the order of `web3.eth.getAccounts`, so the first one is the `defaultAccount`

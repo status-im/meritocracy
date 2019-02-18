@@ -20,7 +20,7 @@ TODO:
 
 // Todo Resolve ENS entries
 const options = [
-{ 'label' : 'Jarrad (Test)', 'value' : '0x926495cf9510174080ef2f7931242e85c0de2af8' },
+{ 'label' : 'Jarrad (Test)', 'value' : '0x061b0227116e76025D5573cFbb1Ac854916286Fe' },
 { 'label' : 'Andreas S.', 'value' : '0x4923121411e884a4af66ec025712eba600a782d3' }, 
 { 'label' : 'andrey.dev', 'value' : '0xA4EcA293cb578a68b190e3e07c2B170dc753fe44' }, 
 { 'label' : 'barry', 'value' : '0xa46b0546481a04b7de049a8a20f8a9b2b2c5cc05' }, 
@@ -114,14 +114,14 @@ class App extends React.Component {
     });
   }
 
-  handleContributorSelection(selectedContributors) {
-    this.setState({ selectedContributors });
+  handleContributorSelection(_selectedContributors) {
+    this.setState({ selectedContributors: _selectedContributors });
     console.log(`selectedContributors:`, selectedContributors);
   }
 
-  handleAwardChange(amount) {
+  handleAwardChange(_amount) {
     let maxAllocation = this.state.allocation / this.state.selectedContributors.length;
-    amount = (amount <=  maxAllocation ? amount : maxAllocation );
+    amount = (_amount <=  maxAllocation ? _amount : maxAllocation );
     this.setState({ award: amount });
     console.log(`handleAwardChange:`, amount);
   }
@@ -131,6 +131,7 @@ class App extends React.Component {
   }
 
   getContributor(_address) {
+    console.log('getContributor', _address);
     Meritocracy.methods.contributors(_address).call().then(_contributor => {
       var contributorData = this.state.contributorData;
       contributorData[_contributor.addr.toLowerCase()] = _contributor; // Lowercase here incase we use keys for <Select />
@@ -141,8 +142,9 @@ class App extends React.Component {
   }
 
   getContributors() {
+    console.log('getContributors');
     Meritocracy.methods.getRegistry().call().then(_registry => {
-
+      console.log('got return', _registry); // TODO why is this empty with metamask??
       // This block is probably not needed if can use contributorData keys in <Select />
       let registry = _registry.map(Function.prototype.call, String.prototype.toLowerCase);
       let contributorList = options.filter(_e => {
