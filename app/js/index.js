@@ -102,7 +102,7 @@ class App extends React.Component {
         return this.setState({error: err.message || err});
       }
 
-      this.loadContributor();
+      this.getCurrentContributorData();
 
       this.getContributors();
     });
@@ -124,7 +124,16 @@ class App extends React.Component {
     this.setState({ praise: e.target.value });
   }
 
-  async loadContributor(){
+  resetUIFields(){
+    this.setState({
+      praise: '',
+      selectedContributors: [],
+      error: '',
+      award: 0
+    })
+  }
+
+  async getCurrentContributorData(){
     const currentContributor = await this.getContributor(web3.eth.defaultAccount);
     this.setState({currentContributor});
   }
@@ -167,9 +176,8 @@ class App extends React.Component {
       const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
       const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
 
-      // TODO: update UI
-      // TODO: empty fields
-
+      this.getCurrentContributorData();
+      this.resetUIFields();
     } catch(e) {
       console.log('tx failed? got enough tokens to award?');
       console.log(e);
@@ -196,7 +204,7 @@ class App extends React.Component {
       const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
       const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
       
-      // TODO: update UI
+      this.getCurrentContributorData();
     } catch(e) {
       console.log('tx failed? Did you allocate all your tokens first?');
     }
