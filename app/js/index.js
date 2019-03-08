@@ -1,12 +1,12 @@
 /*global web3*/
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Tabs, Tab, Button, Grid, Row, Col } from 'react-bootstrap';
+import {Button, Grid, Row, Col } from 'react-bootstrap';
 import * as NumericInput from 'react-numeric-input';
 import Select from 'react-select';
 
 import EmbarkJS from 'Embark/EmbarkJS';
-// import Blockchain from './components/blockchain';
 
 import Meritocracy from 'Embark/contracts/Meritocracy';
 
@@ -16,6 +16,7 @@ import Meritocracy from 'Embark/contracts/Meritocracy';
 TODO:
 - list praise for contributor
 - listen to events to update UI, (initially on page load but within function calls)
+- error handling
 */
 
 // Todo Resolve ENS entries
@@ -33,7 +34,7 @@ const options = [
 { 'label' : 'Hester', 'value' : '0x8c4f71b3cf6a76de2cc239a6fa84e1a80e589598' }, 
 { 'label' : 'Hutch', 'value' : '0x34a4b73100d11815ee4bb0ebcc86ba5824b12134' }, 
 { 'label' : 'igor.stateofus.eth', 'value' : '0x6a069D627BAA9a627D79D2097EC979E2c58F1984' }, 
-{ 'label' : 'jakubgs.eth',  'value' : 'jakubgs.eth'},
+//{ 'label' : 'jakubgs.eth',  'value' : 'jakubgs.eth'},
 { 'label' : 'Jinho', 'value' : '0x7407bF49004ee99d9B2caA2fb90B476bfF2DbCaf' }, 
 { 'label' : 'Jonathan Barker', 'value' : '0xf23d05F375A8367b150f7Ad1A37DFd9E3c35eE56' }, 
 { 'label' : 'Jonathan Rainville', 'value' : '0x9ce0056c5fc6bb9459a4dcfa35eaad8c1fee5ce9' }, 
@@ -59,7 +60,7 @@ const options = [
 { 'label' : 'michaelb', 'value' : '0xdba0bade45727776bbb0d93176ee1ddba830f319' }, 
 { 'label' : 'cryptowanderer', 'value' : '0x406abd306b633b6460666b4092784a3330370c7b' }, 
 { 'label' : 'adam.stateofus.eth', 'value' : '0x074032269ca1775896c92304d45f80b5a67a5bcb' }, 
-{ 'label' : 'André Medeiros', 'value' : 'andre medeiros.eth' }, 
+//{ 'label' : 'André Medeiros', 'value' : 'andremedeiros.eth' }, 
 { 'label' : 'rramos    /   rramos.stateofus.eth', 'value' : '0xc379330ae48716b81d7411813c3250cd89271788' }, 
 { 'label' : 'emizzle', 'value' : '0x91Ef8ef20Adf13E42757a3Ed6Ff2b1249bE15544' }, 
 { 'label' : 'jason.stateofus.eth', 'value' : '0x4636fb2F6D1DC335EA655795064c2092c89148aB' }
@@ -67,6 +68,21 @@ const options = [
 
 
 class App extends React.Component {
+
+  state = {
+    error: null,
+    selectedContributors: [],
+    contributorList: [],
+    currentContributor: {
+      allocation: 0,
+      totalForfeited: 0,
+      totalReceived: 0,
+      received: 0,
+      status: []
+    },
+    award: 0,
+    praise: ''
+  }
 
   constructor(props) {
     super(props);
@@ -76,39 +92,17 @@ class App extends React.Component {
     this.handlePraiseChange = this.handlePraiseChange.bind(this);
     this.awardTokens = this.awardTokens.bind(this);
     this.withdrawTokens = this.withdrawTokens.bind(this);
-
-    this.state = {
-      error: null,
-      activeTab: 1,
-      whisperEnabled: false,
-      storageEnabled: false,
-      blockchainEnabled: false,
-
-      selectedContributors: [],
-      contributorList: [], // TODO: Merge these data structures?
-      contributorData: {},
-      award: 0,
-      praise: ''
-    };
   }
 
   componentDidMount() {
-    EmbarkJS.onReady((err) => {
+    EmbarkJS.onReady(async (err) => {
+      // TODO: check for chain
       this.setState({blockchainEnabled: true});
       if (err) {
-       return this.setState({error: err.message || err});
+        return this.setState({error: err.message || err});
       }
 
-      // console.log(web3.eth.defaultAccount);
-      var contributorData = {};
-      contributorData[web3.eth.defaultAccount] = {
-        allocation: 0,
-        totalForfeited: 0,
-        totalReceived: 0,
-        received: 0,
-        status: []
-      };
-      this.setState({contributorData: contributorData, defaultAccount : web3.eth.defaultAccount });
+      this.loadContributor();
 
       this.getContributors();
     });
@@ -116,100 +110,75 @@ class App extends React.Component {
 
   handleContributorSelection(_selectedContributors) {
     this.setState({ selectedContributors: _selectedContributors });
-    console.log(`selectedContributors:`, selectedContributors);
   }
 
   handleAwardChange(_amount) {
-    let maxAllocation = this.state.allocation / this.state.selectedContributors.length;
-    amount = (_amount <=  maxAllocation ? _amount : maxAllocation );
-    this.setState({ award: amount });
-    console.log(`handleAwardChange:`, amount);
+    const { currentContributor: {allocation}, selectedContributors} = this.state;
+    
+    const maxAllocation = allocation / selectedContributors.length;
+    const award = (_amount <=  maxAllocation ? _amount : maxAllocation );
+    this.setState({award});
   }
 
   handlePraiseChange(e) {
     this.setState({ praise: e.target.value });
   }
 
-  getContributor(_address) {
-    console.log('getContributor', _address);
-    Meritocracy.methods.contributors(_address).call().then(_contributor => {
-      var contributorData = this.state.contributorData;
-      contributorData[_contributor.addr.toLowerCase()] = _contributor; // Lowercase here incase we use keys for <Select />
-      console.log(_contributor);
-      this.setState({ contributorData : contributorData });
-      this.forceUpdate() // ... 
-    });
+  async loadContributor(){
+    const currentContributor = await this.getContributor(web3.eth.defaultAccount);
+    this.setState({currentContributor});
   }
 
-  getContributors() {
-    console.log('getContributors');
-    Meritocracy.methods.getRegistry().call().then(_registry => {
-      console.log('got return', _registry); // TODO why is this empty with metamask??
-      // This block is probably not needed if can use contributorData keys in <Select />
-      let registry = _registry.map(Function.prototype.call, String.prototype.toLowerCase);
-      let contributorList = options.filter(_e => {
-            if (registry.includes(_e.value.toLowerCase())) return _e;
-            // TODO resolve ENS names
-              //             EmbarkJS.Names.resolve("ethereum.eth").then(address => {
-              //   console.log("the address for ethereum.eth is: " + address);
-              // })
-      });
-      this.setState({ contributorList : contributorList });
-
-      // Get Individual Contributor Data
-      for(var i=0; i<_registry.length;i++) {
-            this.getContributor(_registry[i]);
-      }
-    });
+  async getContributor(_address) {
+    return await Meritocracy.methods.contributors(_address).call();
   }
 
-  awardTokens(e) {
-    let  currentContributor = this.state.contributorData[this.state.defaultAccount];
+  async getContributors() {
+    const registry = await Meritocracy.methods.getRegistry().call();
+    const contributorList = options.map(prepareOptions).filter(x => registry.includes(web3.utils.toChecksumAddress(x.value)));
+    this.setState({contributorList});
+  }
+  
+  async awardTokens(e) {
+    const {award, selectedContributors, praise} = this.state;
 
     // TODO some sanity checks
-    if(this.state.award <= 0) {
+    if(award <= 0) {
       console.log('amount must be more than 0');
       return;
     }
 
+    let addresses = selectedContributors.map(a => a.value);
 
-    let addresses = this.state.selectedContributors.map(a => a.value);
-
+    let toSend;
     switch(addresses.length) {
       case 0:
         console.log('No Contributor Selected');
         return;
       case 1:
-        // use award
-        console.log('use award');
-       
-        try {
-          Meritocracy.methods.award(addresses[0], this.state.award, this.state.praise).send().then(_contributor => {
-            getContributor(this.state.defaultAccount);
-          });
-        } catch(e) {
-          console.log('tx failed? got enough tokens to award?');
-        }
+        toSend = Meritocracy.methods.award(addresses[0], award, praise);
         break;
       default:
-        // use awardContributors
-        console.log('using awardContributors');
-
-        try {
-          Meritocracy.methods.awardContributors(addresses, this.state.award, this.state.praise).send().then(_contributor => {
-            getContributor(this.state.defaultAccount);
-          });
-        } catch(e) {
-          console.log('tx failed? got enough tokens to award?');
-        }
+        toSend = Meritocracy.methods.awardContributors(addresses, award, praise);
         break;
+    }
+
+    try {
+      const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
+      const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
+
+      // TODO: update UI
+      // TODO: empty fields
+
+    } catch(e) {
+      console.log('tx failed? got enough tokens to award?');
+      console.log(e);
     }
   }
 
-  withdrawTokens(e) {
 
-    console.log('withdrawTokens');
-    let  currentContributor = this.state.contributorData[this.state.defaultAccount];
+  async withdrawTokens(e) {
+    const {currentContributor} = this.state;
 
     if (currentContributor.received == 0) {
       console.log('can only call withdraw when you have tokens');
@@ -221,17 +190,21 @@ class App extends React.Component {
       return;
     }
 
+    const toSend = Meritocracy.methods.withdraw();
+
     try {
-      Meritocracy.methods.withdraw().send().then(_contributor => {
-        getContributor(this.state.defaultAccount);
-      });
+      const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
+      const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
+      
+      // TODO: update UI
     } catch(e) {
       console.log('tx failed? Did you allocate all your tokens first?');
     }
   }
 
   render() {
-    const { selectedContributors, contributorList, award, contributorData, defaultAccount } = this.state;
+    const { selectedContributors, contributorList, award, currentContributor } = this.state;
+        
     if (this.state.error) {
       return (<div>
         <div>Something went wrong connecting to ethereum. Please make sure you have a node running or are using metamask to connect to the ethereum network:</div>
@@ -239,43 +212,59 @@ class App extends React.Component {
       </div>);
     }
 
-    if(!defaultAccount) return (<div>Cannot Find web3.eth.defaultAccount</div>);
-    const currentContributor = contributorData[defaultAccount];
-    console.log('currentContributor.allocation', defaultAccount, currentContributor.allocation);
+    const maxAllocation = selectedContributors.length ? Math.floor(currentContributor.allocation / selectedContributors.length) : 0;
+
     return (<div>
       <h3>Status Meritocracy</h3>
      
-        <span>Your Total Received Kudos: { currentContributor.totalReceived } SNT</span> <br/>
-        <span>Your Total Forfeited Kudos: { currentContributor.totalForfeited } SNT</span> <br/>
+      <span>Your Total Received Kudos: { currentContributor.totalReceived || 0} SNT</span> <br/>
+      <span>Your Total Forfeited Kudos: { currentContributor.totalForfeited || 0} SNT</span> <br/>
 
-          <h4>Award Kudos</h4>
+      <h4>Award Kudos</h4>
+      <Select
+          isMulti
+          defaultValue={selectedContributors}
+          onChange={this.handleContributorSelection}
+          options={contributorList}
+          placeholder="Choose Contributor(s)..."
+        />
+      <span>Your Allocatable Kudos: { currentContributor.allocation } SNT</span> <br/>
+
+
+      <br/>
+      <NumericInput mobile step={5} min={0} max={maxAllocation} onChange={this.handleAwardChange} defaultValue={award} />  <br/>
+
+      <input placeholder="Enter your praise..." onChange={this.handlePraiseChange}/>  <br/>
+      <span> Total Awarding: {award * selectedContributors.length} SNT </span>   <br/>
+      <Button variant="outline-primary" onClick={this.awardTokens}>Award</Button>
+
+
+      <h4>Your Kudos History</h4>
+      <span>Your Received Kudos: <b>{ currentContributor.received } SNT</b> <Button variant="outline-primary"  onClick={this.withdrawTokens}>Withdraw</Button></span>  <br/>
+      <Grid>
+        <Row>
+          <Col>0x00 has sent you 500 SNT "keep up the good work"</Col>
+        </Row>
+      </Grid>
         
-          <Select
-              isMulti
-              defaultValue={selectedContributors}
-              onChange={this.handleContributorSelection}
-              options={contributorList}
-              placeholder="Choose Contributor(s)..."
-            />  <br/>
-
-            <span>Your Allocatable Kudos: { currentContributor.allocation } SNT</span> <br/>
-
-            <NumericInput mobile step={5} min={0} max={currentContributor.allocation / selectedContributors.length } onChange={this.handleAwardChange} defaultValue={award} />  <br/>
-
-            <input placeholder="Enter your praise..."  onChange={this.handlePraiseChange}/>  <br/>
-            <span> Total Awarding: {award * selectedContributors.length} SNT </span>   <br/>
-          <Button variant="outline-primary"  onClick={this.awardTokens}>Award</Button>
-
-          <h4>Your Kudos History</h4>
-
-          <span>Your Received Kudos: { currentContributor.received } SNT <Button variant="outline-primary"  onClick={this.withdrawTokens}>Withdraw</Button></span>  <br/>
-          <Grid>
-            <Row>
-              <Col>0x00 has sent you 500 SNT "keep up the good work"</Col>
-            </Row>
-          </Grid>
     </div>);
   }
 }
+
+
+// === Utils ===============================================
+
+const prepareOptions = option => {
+  if(option.value.match(/^0x[0-9A-Za-z]{40}$/)){ // Address
+    option.value = web3.utils.toChecksumAddress(option.value);
+  } else { // ENS Name
+    // TODO: resolve ENS names
+    // EmbarkJS.Names.resolve("ethereum.eth").then(address => {
+    // console.log("the address for ethereum.eth is: " + address);
+    //
+  }
+  return option;
+}
+
 
 ReactDOM.render(<App></App>, document.getElementById('app'));

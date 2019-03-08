@@ -159,8 +159,7 @@ module.exports = {
       "Meritocracy.methods.addContributors([" + getContributors().toString() + "]).send()",
       // Allocate Owner Tokens
       "SNT.methods.approve('$Meritocracy', 10000).send()",
-      "Meritocracy.methods.allocate(10000).send()"
-
+      "Meritocracy.methods.allocate(10000).send()",
     ]
 
   },
