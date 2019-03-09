@@ -2,7 +2,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Button, Grid, Row, Col } from 'react-bootstrap';
+import {Button, Grid, Row, Col, Alert } from 'react-bootstrap';
 import * as NumericInput from 'react-numeric-input';
 import Select from 'react-select';
 
@@ -16,7 +16,6 @@ import Meritocracy from 'Embark/contracts/Meritocracy';
 TODO:
 - list praise for contributor
 - listen to events to update UI, (initially on page load but within function calls)
-- error handling
 */
 
 // Todo Resolve ENS entries
@@ -71,6 +70,7 @@ class App extends React.Component {
 
   state = {
     error: null,
+    errorMsg: null,
     busy: true,
     selectedContributors: [],
     contributorList: [],
@@ -131,6 +131,7 @@ class App extends React.Component {
       praise: '',
       selectedContributors: [],
       error: '',
+      errorMsg: '',
       award: 0
     })
   }
@@ -155,7 +156,7 @@ class App extends React.Component {
 
     // TODO some sanity checks
     if(award <= 0) {
-      console.log('amount must be more than 0');
+      this.setState({errorMsg: 'amount must be more than 0'});
       return;
     }
 
@@ -164,7 +165,7 @@ class App extends React.Component {
     let toSend;
     switch(addresses.length) {
       case 0:
-        console.log('No Contributor Selected');
+        this.setState({errorMsg: 'No Contributor Selected'});
         return;
       case 1:
         toSend = Meritocracy.methods.award(addresses[0], award, praise);
@@ -183,8 +184,8 @@ class App extends React.Component {
       this.getCurrentContributorData();
       this.resetUIFields();
     } catch(e) {
-      console.log('tx failed? got enough tokens to award?');
-      console.log(e);
+      this.setState({errorMsg: 'tx failed? got enough tokens to award?'});
+      console.error(e);
     } finally {
       this.setState({busy: false});
     }
@@ -195,12 +196,12 @@ class App extends React.Component {
     const {currentContributor} = this.state;
 
     if (currentContributor.received == 0) {
-      console.log('can only call withdraw when you have tokens');
+      this.setState({errorMsg: 'can only call withdraw when you have tokens'});
       return;
     }
 
     if ( currentContributor.allocation > 0 ) {
-      console.log('you must allocate all your tokens');
+      this.setState({errorMsg: 'you must allocate all your tokens'});
       return;
     }
 
@@ -214,19 +215,20 @@ class App extends React.Component {
       
       this.getCurrentContributorData();
     } catch(e) {
-      console.log('tx failed? Did you allocate all your tokens first?');
+      this.setState({errorMsg: 'tx failed? Did you allocate all your tokens first?'});
+      console.error(e);
     } finally {
       this.setState({busy: false});
     }
   }
 
   render() {
-    const { selectedContributors, contributorList, award, currentContributor, busy } = this.state;
+    const { selectedContributors, contributorList, award, currentContributor, busy, error, errorMsg } = this.state;
         
-    if (this.state.error) {
+    if (error) {
       return (<div>
         <div>Something went wrong connecting to ethereum. Please make sure you have a node running or are using metamask to connect to the ethereum network:</div>
-        <div>{this.state.error}</div>
+        <div>{error}</div>
       </div>);
     }
 
@@ -235,6 +237,8 @@ class App extends React.Component {
     return (<div>
       <h3>Status Meritocracy</h3>
      
+      {errorMsg && <Alert bsStyle="danger">{errorMsg}</Alert>}
+
       <span>Your Total Received Kudos: { currentContributor.totalReceived || 0} SNT</span> <br/>
       <span>Your Total Forfeited Kudos: { currentContributor.totalForfeited || 0} SNT</span> <br/>
 
