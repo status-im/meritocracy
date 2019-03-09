@@ -71,6 +71,7 @@ class App extends React.Component {
 
   state = {
     error: null,
+    busy: true,
     selectedContributors: [],
     contributorList: [],
     currentContributor: {
@@ -97,10 +98,11 @@ class App extends React.Component {
   componentDidMount() {
     EmbarkJS.onReady(async (err) => {
       // TODO: check for chain
-      this.setState({blockchainEnabled: true});
       if (err) {
         return this.setState({error: err.message || err});
       }
+
+      this.setState({busy: false});
 
       this.getCurrentContributorData();
 
@@ -173,6 +175,8 @@ class App extends React.Component {
     }
 
     try {
+      this.setState({busy: true});
+
       const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
       const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
 
@@ -181,6 +185,8 @@ class App extends React.Component {
     } catch(e) {
       console.log('tx failed? got enough tokens to award?');
       console.log(e);
+    } finally {
+      this.setState({busy: false});
     }
   }
 
@@ -201,17 +207,21 @@ class App extends React.Component {
     const toSend = Meritocracy.methods.withdraw();
 
     try {
+      this.setState({busy: true});
+
       const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
       const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
       
       this.getCurrentContributorData();
     } catch(e) {
       console.log('tx failed? Did you allocate all your tokens first?');
+    } finally {
+      this.setState({busy: false});
     }
   }
 
   render() {
-    const { selectedContributors, contributorList, award, currentContributor } = this.state;
+    const { selectedContributors, contributorList, award, currentContributor, busy } = this.state;
         
     if (this.state.error) {
       return (<div>
@@ -235,20 +245,21 @@ class App extends React.Component {
           onChange={this.handleContributorSelection}
           options={contributorList}
           placeholder="Choose Contributor(s)..."
+          isDisabled={busy}
         />
       <span>Your Allocatable Kudos: { currentContributor.allocation } SNT</span> <br/>
 
 
       <br/>
-      <NumericInput mobile step={5} min={0} max={maxAllocation} onChange={this.handleAwardChange} defaultValue={award} />  <br/>
+      <NumericInput mobile step={5} min={0} max={maxAllocation} onChange={this.handleAwardChange} defaultValue={award} disabled={busy} />  <br/>
 
-      <input placeholder="Enter your praise..." onChange={this.handlePraiseChange}/>  <br/>
+      <input disabled={busy} placeholder="Enter your praise..." onChange={this.handlePraiseChange}/>  <br/>
       <span> Total Awarding: {award * selectedContributors.length} SNT </span>   <br/>
-      <Button variant="outline-primary" onClick={this.awardTokens}>Award</Button>
+      <Button disabled={busy} variant="outline-primary" onClick={this.awardTokens}>Award</Button>
 
 
       <h4>Your Kudos History</h4>
-      <span>Your Received Kudos: <b>{ currentContributor.received } SNT</b> <Button variant="outline-primary"  onClick={this.withdrawTokens}>Withdraw</Button></span>  <br/>
+      <span>Your Received Kudos: <b>{ currentContributor.received } SNT</b> <Button variant="outline-primary"  onClick={this.withdrawTokens} disabled={busy}>Withdraw</Button></span>  <br/>
       <Grid>
         <Row>
           <Col>0x00 has sent you 500 SNT "keep up the good work"</Col>
