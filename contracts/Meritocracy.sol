@@ -151,6 +151,22 @@ contract Meritocracy {
         emit ContributorTransaction(cSender.addr, cReceiver.addr);
     }
 
+    function getStatusLength(address _contributor) public view returns (uint) {
+        return contributors[_contributor].status.length;
+    }
+
+    function getStatus(address _contributor, uint _index) public view returns (
+        address author,
+        string memory praise,
+        uint256 amount,
+        uint256 time
+    ) {
+        author = contributors[_contributor].status[_index].author;
+        praise = contributors[_contributor].status[_index].praise;
+        amount = contributors[_contributor].status[_index].amount;
+        time = contributors[_contributor].status[_index].time;
+    }
+
     // Allow Contributor to award multiple Contributors 
     function awardContributors(address[] calldata _contributors, uint256 _amountEach,  string calldata _praise) external {
         // Locals

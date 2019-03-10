@@ -18,6 +18,9 @@ TODO:
 - listen to events to update UI, (initially on page load but within function calls)
 */
 
+const MAINNET = 1;
+const TESTNET = 3;
+
 // Todo Resolve ENS entries
 const options = [
 { 'label' : 'Jarrad (Test)', 'value' : '0x061b0227116e76025D5573cFbb1Ac854916286Fe' },
@@ -82,7 +85,8 @@ class App extends React.Component {
       status: []
     },
     award: 0,
-    praise: ''
+    praise: '',
+    networkName: ''
   }
 
   constructor(props) {
@@ -97,11 +101,19 @@ class App extends React.Component {
 
   componentDidMount() {
     EmbarkJS.onReady(async (err) => {
-      // TODO: check for chain
       if (err) {
         return this.setState({error: err.message || err});
       }
 
+      const netId = await web3.eth.net.getId();
+      if (EmbarkJS.environment === 'testnet' && netId !== TESTNET) {
+        this.setState({ error: 'Please connect to Ropsten' });
+        return;
+      } else if (EmbarkJS.environment === 'livenet' && netId !== MAINNET) {
+        this.setState({ error: 'Please connect to Mainnet' });
+        return;
+      }
+      
       this.setState({busy: false});
 
       this.getCurrentContributorData();
@@ -133,16 +145,31 @@ class App extends React.Component {
       error: '',
       errorMsg: '',
       award: 0
-    })
+    });
   }
 
   async getCurrentContributorData(){
     const currentContributor = await this.getContributor(web3.eth.defaultAccount);
+
+    let praises = [];
+    for(let i = 0; i < currentContributor.praiseNum; i++){
+      praises.push(Meritocracy.methods.getStatus(web3.eth.defaultAccount, i).call());
+    }
+
+    console.log(currentContributor);
+    currentContributor.praises = await Promise.all(praises);
+    currentContributor.allocation = web3.utils.fromWei(currentContributor.allocation, "ether");
+    currentContributor.totalForfeited = web3.utils.fromWei(currentContributor.totalForfeited, "ether");
+    currentContributor.totalReceived = web3.utils.fromWei(currentContributor.totalReceived, "ether");
+    currentContributor.received = web3.utils.fromWei(currentContributor.received, "ether");
+
     this.setState({currentContributor});
   }
 
   async getContributor(_address) {
-    return await Meritocracy.methods.contributors(_address).call();
+    const contributor = await Meritocracy.methods.contributors(_address).call();
+    contributor.praiseNum = await Meritocracy.methods.getStatusLength(_address).call();
+    return contributor;
   }
 
   async getContributors() {
@@ -162,16 +189,18 @@ class App extends React.Component {
 
     let addresses = selectedContributors.map(a => a.value);
 
+    const sntAmount = web3.utils.toWei(award.toString(), "ether");
+
     let toSend;
     switch(addresses.length) {
       case 0:
         this.setState({errorMsg: 'No Contributor Selected'});
         return;
       case 1:
-        toSend = Meritocracy.methods.award(addresses[0], award, praise);
+        toSend = Meritocracy.methods.award(addresses[0], sntAmount, praise);
         break;
       default:
-        toSend = Meritocracy.methods.awardContributors(addresses, award, praise);
+        toSend = Meritocracy.methods.awardContributors(addresses, sntAmount, praise);
         break;
     }
 
@@ -180,9 +209,8 @@ class App extends React.Component {
 
       const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
       const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
-
-      this.getCurrentContributorData();
       this.resetUIFields();
+      this.getCurrentContributorData();
     } catch(e) {
       this.setState({errorMsg: 'tx failed? got enough tokens to award?'});
       console.error(e);
@@ -224,7 +252,7 @@ class App extends React.Component {
 
   render() {
     const { selectedContributors, contributorList, award, currentContributor, busy, error, errorMsg } = this.state;
-        
+    
     if (error) {
       return (<div>
         <div>Something went wrong connecting to ethereum. Please make sure you have a node running or are using metamask to connect to the ethereum network:</div>
@@ -266,7 +294,7 @@ class App extends React.Component {
       <span>Your Received Kudos: <b>{ currentContributor.received } SNT</b> <Button variant="outline-primary"  onClick={this.withdrawTokens} disabled={busy}>Withdraw</Button></span>  <br/>
       <Grid>
         <Row>
-          <Col>0x00 has sent you 500 SNT "keep up the good work"</Col>
+          {currentContributor.praises && currentContributor.praises.map((item, i) => <Col key={i}>{item.author} has sent you {web3.utils.fromWei(item.amount, "ether")} SNT {item.praise && "\"" + item.praise + "\""}</Col>)}
         </Row>
       </Grid>
         

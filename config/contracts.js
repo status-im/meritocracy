@@ -154,12 +154,12 @@ module.exports = {
     },
     "afterDeploy": [
       // Give Tokens to Meritocracy Owner
-      "SNT.methods.generateTokens('$accounts[0]', '100000000000000000000').send()",
+      "SNT.methods.generateTokens('$accounts[0]', '1000000000000000000000').send()",
       // Add All Contributors
       "Meritocracy.methods.addContributors([" + getContributors().toString() + "]).send()",
       // Allocate Owner Tokens
-      "SNT.methods.approve('$Meritocracy', 10000).send()",
-      "Meritocracy.methods.allocate(10000).send()",
+      "SNT.methods.approve('$Meritocracy', '1000000000000000000000').send()",
+      "Meritocracy.methods.allocate('1000000000000000000000').send()",
     ]
 
   },
