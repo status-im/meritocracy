@@ -88,14 +88,20 @@ contract Meritocracy {
     // Split amount over each contributor in registry, any contributor can allocate? TODO maybe relax this restriction, so anyone can allocate tokens
     function allocate(uint256 _amount) external {
         // Locals
-        uint256 individualAmount;
+        
         // Contributor memory cAllocator = contributors[msg.sender];
         // Requirements
         // require(cAllocator.addr != address(0)); // is sender a Contributor? TODO maybe relax this restriction.
-        require(token.transferFrom(msg.sender, address(this), _amount));
+        uint256 individualAmount = _amount / registry.length;
+
+        // removing decimals
+        individualAmount = (individualAmount / 1000000000000000000 * 1000000000000000000);
+        
+        uint amount = individualAmount * registry.length;
+        
+        require(token.transferFrom(msg.sender, address(this), amount));
         // Body
         // cAllocator.inPot = true;
-        individualAmount = _amount / registry.length;
         for (uint256 i = 0; i < registry.length; i++) {
                contributors[registry[i]].allocation += individualAmount;
         }
