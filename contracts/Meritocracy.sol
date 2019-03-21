@@ -126,7 +126,7 @@ contract Meritocracy {
         uint256 r = cReceiver.received;
         cReceiver.received = 0;
         // cReceiver.inPot = false;
-        token.transferFrom(address(this), cReceiver.addr, r);
+        token.transfer(cReceiver.addr, r);
         emit ContributorWithdrew(cReceiver.addr);
     }
 
@@ -289,7 +289,7 @@ contract Meritocracy {
                 c.received = 0;
                 c.allocation = 0;
                 // WARN: Should totalReceived and totalForfeited be zeroed-out? 
-                token.transferFrom(address(this), c.addr, r); // Transfer any owed tokens to contributor 
+                token.transfer(c.addr, r); // Transfer any owed tokens to contributor 
         }
         lastForfeit = block.timestamp;
         token = ERC20Token(_token);
@@ -299,7 +299,7 @@ contract Meritocracy {
     // Failsafe, Owner can escape hatch all Tokens and ETH from Contract.
     function escape() public onlyOwner {
         // Body
-        token.transferFrom(address(this), owner,  token.balanceOf(address(this)));
+        token.transfer(owner,  token.balanceOf(address(this)));
         owner.transfer(address(this).balance);
         emit EscapeHatchTriggered(msg.sender);
     }
@@ -309,7 +309,7 @@ contract Meritocracy {
     function escape(address _token) external onlyOwner {
         // Body
         ERC20Token t = ERC20Token(_token);
-        t.transferFrom(address(this), owner,  t.balanceOf(address(this)));
+        t.transfer(owner,  t.balanceOf(address(this)));
         escape();
     }
 
