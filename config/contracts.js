@@ -137,7 +137,7 @@ module.exports = {
         "address": "0xc55cF4B03948D7EBc8b9E8BAD92643703811d162"
       },
       "Meritocracy": {
-        "args": [ "$SNT", 66]
+        "address": "0xf40f9418D8236f373eB27f91Cc1a01739EB8c301"
       }
     },
     deployment: {
@@ -148,13 +148,35 @@ module.exports = {
     },
     "afterDeploy": [
       // Add All Contributors
-      "Meritocracy.methods.addContributors([" + getContributors().toString() + "]).send()",
+    //  "Meritocracy.methods.addContributors([" + getContributors().toString() + "]).send()",
     ]
   },
 
   // merges with the settings in default
   // used with "embark run livenet"
   livenet: {
+    contracts: {
+      "MiniMeToken": { "deploy": false },
+      "MiniMeTokenFactory": {
+        "address": "0xa1c957c0210397d2d0296341627b74411756d476"
+      },
+      "SNT": {
+        "address": "0x744d70fdbe2ba4cf95131626614a1763df805b9e"
+      },
+      "Meritocracy": {
+        "address": "0x3d8ec98c08b55ec42310aace562e077d784591d6"
+      }
+    },
+    deployment: {
+      accounts: [{
+        mnemonic: "your mainnet mnemonic here",
+        numAddresses: "10"
+      }]
+    },
+    "afterDeploy": [
+      // Add All Contributors
+    //  "Meritocracy.methods.addContributors([" + getContributors().toString() + "]).send()",
+    ]
   },
 
   // you can name an environment with specific settings and then specify with
