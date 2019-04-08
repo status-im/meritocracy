@@ -1,7 +1,6 @@
 /*global web3*/
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {Button, Grid, Row, Col, Alert } from 'react-bootstrap';
 import * as NumericInput from 'react-numeric-input';
 import Select from 'react-select';
@@ -69,7 +68,7 @@ class App extends React.Component {
         this.setState({ error: 'Please connect to Mainnet' });
         return;
       }
-      
+
       this.setState({busy: false});
 
       options = options.map(prepareOptions);
@@ -86,7 +85,7 @@ class App extends React.Component {
 
   handleAwardChange(_amount) {
     const { currentContributor: {allocation}, selectedContributors} = this.state;
-    
+
     const maxAllocation = allocation / selectedContributors.length;
     const award = (_amount <=  maxAllocation ? _amount : maxAllocation );
     this.setState({award});
@@ -137,7 +136,7 @@ class App extends React.Component {
     const contributorList = options.filter(x => registry.includes(x.value) && x.value !== web3.eth.defaultAccount);
     this.setState({contributorList});
   }
-  
+
   async awardTokens(e) {
     const {award, selectedContributors, praise} = this.state;
 
@@ -200,7 +199,7 @@ class App extends React.Component {
 
       const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
       const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
-      
+
       this.getCurrentContributorData();
     } catch(e) {
       this.setState({errorMsg: 'tx failed? Did you allocate all your tokens first?'});
@@ -212,7 +211,7 @@ class App extends React.Component {
 
   render() {
     const { selectedContributors, contributorList, award, currentContributor, praise, busy, error, errorMsg } = this.state;
-    
+
     if (error) {
       return (<div>
         <div>Something went wrong connecting to ethereum. Please make sure you have a node running or are using metamask to connect to the ethereum network:</div>
@@ -224,7 +223,7 @@ class App extends React.Component {
 
     return (<div>
       <h3>Status Meritocracy</h3>
-     
+
       {errorMsg && <Alert bsStyle="danger">{errorMsg}</Alert>}
 
       {currentContributor.name &&  <h2>Hello, {currentContributor.name} !</h2>}
@@ -261,7 +260,7 @@ class App extends React.Component {
           })}
         </Row>
       </Grid>
-        
+
     </div>);
   }
 }
