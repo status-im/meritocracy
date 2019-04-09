@@ -13,7 +13,10 @@
     "ipfs-api": "17.2.4"
   },
   "plugins": {
-    "embarkjs-connector-web3": {}
+    "embarkjs-connector-web3": {},
+    "embark-solc": {
+      "outputBinary": false
+    }
   },
   "options": {
     "solc": {
