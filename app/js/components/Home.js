@@ -6,21 +6,19 @@ import Select from 'react-select';
 
 import Meritocracy from 'Embark/contracts/Meritocracy';
 
+import {getContributorList} from '../services/Meritocracy';
+
 /*
 TODO:
 - list praise for contributor
 - listen to events to update UI, (initially on page load but within function calls)
 */
 
-// Todo Resolve ENS entries
-import contributors from "../contributors";
-let options = contributors;
-
 class Home extends React.Component {
 
   state = {
     errorMsg: null,
-    busy: false,
+    busy: true,
     selectedContributors: [],
     contributorList: [],
     currentContributor: {
@@ -45,11 +43,18 @@ class Home extends React.Component {
   }
 
   async componentDidMount() {
-    options = options.map(prepareOptions);
+    try {
+      this.contibutorList = await getContributorList();
+      this.contibutorList = this.contibutorList.map(prepareOptions);
 
-    await this.getContributors();
+      await this.getContributors();
 
-    this.getCurrentContributorData();
+      this.getCurrentContributorData();
+
+      this.setState({busy: false});
+    } catch (e) {
+      this.setState({errorMessage: e.message || e});
+    }
   }
 
   handleContributorSelection(_selectedContributors) {
@@ -85,7 +90,7 @@ class Home extends React.Component {
       praises.push(Meritocracy.methods.getStatus(web3.eth.defaultAccount, i).call());
     }
 
-    const contribData = options.find(x => x.value === web3.eth.defaultAccount);
+    const contribData = this.contibutorList.find(x => x.value === web3.eth.defaultAccount);
     if(contribData) currentContributor.name = contribData.label;
 
     currentContributor.praises = await Promise.all(praises);
@@ -105,7 +110,7 @@ class Home extends React.Component {
 
   async getContributors() {
     const registry = await Meritocracy.methods.getRegistry().call({from: web3.eth.defaultAccount});
-    const contributorList = options.filter(x => registry.includes(x.value) && x.value !== web3.eth.defaultAccount);
+    const contributorList = this.contibutorList.filter(x => registry.includes(x.value) && x.value !== web3.eth.defaultAccount);
     this.setState({contributorList});
   }
 
@@ -188,6 +193,7 @@ class Home extends React.Component {
 
     return (<div>
       {errorMsg && <Alert bsStyle="danger">{errorMsg}</Alert>}
+      {busy && <p>Working...</p>}
 
       {currentContributor.name &&  <h2>Hello, {currentContributor.name} !</h2>}
       <span>Your Total Received Kudos: { currentContributor.totalReceived || 0} SNT</span> <br/>

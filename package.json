@@ -10,6 +10,7 @@
   "license": "ISC",
   "homepage": "",
   "dependencies": {
+    "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
     "embark-solc": "^4.0.1",
     "embarkjs-connector-web3": "^4.0.0",
