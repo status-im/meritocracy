@@ -95,7 +95,7 @@ contract Meritocracy {
         uint256 individualAmount = _amount / registry.length;
 
         // removing decimals
-        individualAmount = (individualAmount / 1000000000000000000 * 1000000000000000000);
+        individualAmount = (individualAmount / 1 ether * 1 ether);
         
         uint amount = individualAmount * registry.length;
         
