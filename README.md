@@ -6,7 +6,7 @@ The Status Meritocracy allows `Contributors` to show their appreciation of other
 
 The Status Meritocracy is a SNT Reward System that allows a `Contributor` in the registry to award allocated SNT, along with praise, to other `Contributors`.
 
-The DApp will also display a leaderboard of `Contributors` who have been awarded the most and have partcipated the most in the Meritocracy, along with their praise
+The DApp will also display a leaderboard of `Contributors` who have been awarded the most and have participated the most in the Meritocracy, along with their praise
 
 ### Goals
 - Allow `Contributors` to build social capital, ideally in the form of Merit (degrades to popularity?)

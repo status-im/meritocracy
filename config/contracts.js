@@ -1,7 +1,7 @@
 const options = require("../app/js/contributors");
 
 function getContributors () {
-   var addresses = options.map(a => "'"+ a.value + "'");
+   var addresses = options.map(a => a.value);
    if ( new Set(addresses).size !==  addresses.length ) {
       throw 'duplicates in options';
    }
@@ -108,16 +108,46 @@ module.exports = {
         }
       ]
     },
-    "afterDeploy": [
-      // Give Tokens to Meritocracy Owner
-      "SNT.methods.generateTokens('$accounts[0]', '1000000000000000000000').send()",
-      // Add All Contributors
-      "Meritocracy.methods.addContributors([" + getContributors().toString() + "]).send()",
-      // Allocate Owner Tokens
-      "SNT.methods.approve('$Meritocracy', '1000000000000000000000').send()",
-      "Meritocracy.methods.allocate('1000000000000000000000').send()",
-    ]
+    afterDeploy: async (deps) => {
+      try {
+        const {SNT, Meritocracy} = deps.contracts;
 
+        const addresses = await deps.web3.eth.getAccounts();
+        const mainAccount = addresses[0];
+        const balance = await SNT.methods.balanceOf(mainAccount).call();
+        if (balance !== '0') {
+          return;
+        }
+        const tokens = '1000000000000000000000';
+
+        console.log('Generating tokens for the main account...');
+        const generateTokens = SNT.methods.generateTokens(mainAccount, tokens);
+        let gas = await generateTokens.estimateGas({from: mainAccount});
+        await generateTokens.send({from: mainAccount, gas});
+
+        // Add All Contributors
+        console.log('Adding all tokens...');
+        const addContributors = Meritocracy.methods.addContributors(getContributors());
+        gas = await addContributors.estimateGas({from: mainAccount});
+        await addContributors.send({from: mainAccount, gas});
+
+        // Allocate Owner Tokens
+        console.log('Approving token transfer...');
+        const approve = SNT.methods.approve(Meritocracy.options.address, tokens);
+        gas = await approve.estimateGas({from: mainAccount});
+        await approve.send({from: mainAccount, gas});
+
+        console.log('Allocating tokens...');
+        const allocate = Meritocracy.methods.allocate(tokens);
+        gas = await allocate.estimateGas({from: mainAccount});
+        await allocate.send({from: mainAccount, gas});
+
+        console.log('All done!')
+      } catch (e) {
+        console.log("------- Error in after deploy ------- ");
+        console.dir(e);
+      }
+    }
   },
 
   // merges with the settings in default

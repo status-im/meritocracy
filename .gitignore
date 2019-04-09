@@ -5,3 +5,4 @@ config/production/password
 config/livenet/password
 chains.json
 embarkArtifacts/
+.idea
