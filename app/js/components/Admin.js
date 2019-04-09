@@ -1,31 +1,42 @@
 /*global web3*/
 import React from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Button, Form, Alert} from 'react-bootstrap';
 import ValidatedForm from 'react-validation/build/form';
 import Input from 'react-validation/build/input';
 import {required, isAddress} from '../validators';
 
+import {addContributor} from '../services/Meritocracy';
+
 class Admin extends React.Component {
   state = {
     contributorName: '',
-    contributorAddress: ''
+    contributorAddress: '',
+    busy: false,
+    error: ''
   };
 
   onChange = (name, e) => {
     this.setState({[name]: e.target.value});
   };
 
-  addContributor = (e) => {
+  addContributor = async (e) => {
     e.preventDefault();
-    console.log('Submit', this.state);
+    this.setState({busy: true});
+    try {
+      await addContributor(this.state.contributorName, this.state.contributorAddress);
+      this.setState({contributorName: '', contributorAddress: '', busy: false});
+    } catch (e) {
+      this.setState({error: e.message || e, busy: false});
+    }
   };
 
   render() {
-    const {contributorAddress, contributorName} = this.state;
-
+    const {contributorAddress, contributorName, error, busy} = this.state;
 
     return (<div>
       <h2>Admin Panel</h2>
+      {error && <Alert variant="danger">{error}</Alert>}
+      {busy && <Alert variant="primary">Working...</Alert>}
       <h3>Add a contributor</h3>
       <ValidatedForm onSubmit={(e) => this.addContributor(e)}>
         <Form.Group controlId="formContributor">
