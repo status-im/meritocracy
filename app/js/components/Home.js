@@ -1,11 +1,8 @@
 /*global web3*/
-
 import React from 'react';
 import {Button, Grid, Row, Col, Alert } from 'react-bootstrap';
 import * as NumericInput from 'react-numeric-input';
 import Select from 'react-select';
-
-import EmbarkJS from 'Embark/EmbarkJS';
 
 import Meritocracy from 'Embark/contracts/Meritocracy';
 
@@ -17,19 +14,15 @@ TODO:
 - listen to events to update UI, (initially on page load but within function calls)
 */
 
-const MAINNET = 1;
-const TESTNET = 3;
-
 // Todo Resolve ENS entries
-import contributors from "./contributors";
+import contributors from "../contributors";
 let options = contributors;
 
-class App extends React.Component {
+class Home extends React.Component {
 
   state = {
-    error: null,
     errorMsg: null,
-    busy: true,
+    busy: false,
     selectedContributors: [],
     contributorList: [],
     currentContributor: {
@@ -40,9 +33,8 @@ class App extends React.Component {
       status: []
     },
     award: 0,
-    praise: '',
-    networkName: ''
-  }
+    praise: ''
+  };
 
   constructor(props) {
     super(props);
@@ -54,29 +46,12 @@ class App extends React.Component {
     this.withdrawTokens = this.withdrawTokens.bind(this);
   }
 
-  componentDidMount() {
-    EmbarkJS.onReady(async (err) => {
-      if (err) {
-        return this.setState({error: err.message || err});
-      }
+  async componentDidMount() {
+    options = options.map(prepareOptions);
 
-      const netId = await web3.eth.net.getId();
-      if (EmbarkJS.environment === 'testnet' && netId !== TESTNET) {
-        this.setState({ error: 'Please connect to Ropsten' });
-        return;
-      } else if (EmbarkJS.environment === 'livenet' && netId !== MAINNET) {
-        this.setState({ error: 'Please connect to Mainnet' });
-        return;
-      }
+    await this.getContributors();
 
-      this.setState({busy: false});
-
-      options = options.map(prepareOptions);
-
-      await this.getContributors();
-
-      this.getCurrentContributorData();
-    });
+    this.getCurrentContributorData();
   }
 
   handleContributorSelection(_selectedContributors) {
@@ -99,7 +74,6 @@ class App extends React.Component {
     this.setState({
       praise: '',
       selectedContributors: [],
-      error: '',
       errorMsg: '',
       award: 0
     });
@@ -132,7 +106,7 @@ class App extends React.Component {
   }
 
   async getContributors() {
-    const registry = await Meritocracy.methods.getRegistry().call();
+    const registry = await Meritocracy.methods.getRegistry().call({from: web3.eth.defaultAccount});
     const contributorList = options.filter(x => registry.includes(x.value) && x.value !== web3.eth.defaultAccount);
     this.setState({contributorList});
   }
@@ -182,7 +156,7 @@ class App extends React.Component {
   async withdrawTokens(e) {
     const {currentContributor} = this.state;
 
-    if (currentContributor.received == 0) {
+    if (currentContributor.received === 0) {
       this.setState({errorMsg: 'can only call withdraw when you have tokens'});
       return;
     }
@@ -210,14 +184,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { selectedContributors, contributorList, award, currentContributor, praise, busy, error, errorMsg } = this.state;
-
-    if (error) {
-      return (<div>
-        <div>Something went wrong connecting to ethereum. Please make sure you have a node running or are using metamask to connect to the ethereum network:</div>
-        <div>{error}</div>
-      </div>);
-    }
+    const { selectedContributors, contributorList, award, currentContributor, praise, busy, errorMsg } = this.state;
 
     const maxAllocation = selectedContributors.length ? currentContributor.allocation / selectedContributors.length : 0;
 
@@ -278,6 +245,6 @@ const prepareOptions = option => {
     //
   }
   return option;
-}
+};
 
-export default App;
+export default Home;
