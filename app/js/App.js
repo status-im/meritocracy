@@ -5,6 +5,7 @@ import ThemeProvider from 'react-bootstrap/ThemeProvider';
 
 import EmbarkJS from 'Embark/EmbarkJS';
 
+import {isAdmin} from './services/Meritocracy';
 import Header from './components/Header';
 import Home from './components/Home';
 import Admin from './components/Admin';
@@ -16,7 +17,8 @@ class App extends React.Component {
 
   state = {
     error: null,
-    loading: true
+    loading: true,
+    isUserAdmin: false
   };
 
   componentDidMount() {
@@ -32,12 +34,15 @@ class App extends React.Component {
       if (EmbarkJS.environment === 'livenet' && netId !== MAINNET) {
         return this.setState({error: 'Please connect to Mainnet'});
       }
-      this.setState({loading: false})
+
+      const isUserAdmin = await isAdmin(web3.eth.defaultAccount);
+
+      this.setState({loading: false, isUserAdmin})
     });
   }
 
   render() {
-    const {error, loading} = this.state;
+    const {error, loading, isUserAdmin} = this.state;
 
     if (error) {
       return (<div>
@@ -54,10 +59,10 @@ class App extends React.Component {
 
     return (<HashRouter>
       <ThemeProvider prefixes={{ btn: 'my-btn' }}>
-        <Header/>
+        <Header isUserAdmin={isUserAdmin}/>
         <Switch>
           <Route exact path="/" component={Home}/>
-          <Route exact path="/admin" component={Admin}/>
+          {isUserAdmin && <Route exact path="/admin" component={Admin}/>}
 
           <Redirect to="/404"/>
         </Switch>
