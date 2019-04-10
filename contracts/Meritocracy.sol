@@ -226,7 +226,7 @@ contract Meritocracy {
     // Remove Contributor from Registry
     // Note: Should not be easy to remove multiple contributors in one tx
     // WARN: Changed to idx, client can do loop by enumerating registry
-    function removeContributor(uint256 idx) external onlyAdmin { // address _contributor
+    function removeContributor(uint256 idx, string calldata _contributorListIPFSHash) external onlyAdmin { // address _contributor
         // Locals
         uint256 registryLength = registry.length - 1;
         // Requirements
@@ -237,6 +237,8 @@ contract Meritocracy {
         registry[idx] = registry[registryLength];
         registry.pop();
         delete contributors[c]; // TODO check if this works
+        // Set new IPFS hash for the list
+        contributorListIPFSHash = _contributorListIPFSHash;
         emit ContributorRemoved(c);
     }
 

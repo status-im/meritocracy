@@ -120,6 +120,18 @@ contract("Meritocracy", function () {
     }
   });
 
+  describe('removeContributor', () => {
+    it('removes with normal values', async () => {
+      let oldRegistry = await Meritocracy.methods.getRegistry().call();
+
+      let result = await Meritocracy.methods.removeContributor(1, IPFS_HASH).send({from: owner});
+
+      let registry = await Meritocracy.methods.getRegistry().call();
+
+      assert.strictEqual(registry.length, oldRegistry.length - 1);
+    })
+  })
+
   // TODO award
   // TODO withdraw before and after
 
@@ -128,7 +140,6 @@ contract("Meritocracy", function () {
   // TODO withdraw after forfeitAllocations
 
  // TODO setMaxContributors smaller than max
- // TODO removeContributors
  // TODO setMaxContributors again
  // TODO addContributors
  // TODO changeOwner
