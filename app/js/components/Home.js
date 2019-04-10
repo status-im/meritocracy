@@ -6,7 +6,7 @@ import Select from 'react-select';
 
 import Meritocracy from 'Embark/contracts/Meritocracy';
 
-import {getContributorList} from '../services/Meritocracy';
+import {getFormattedContributorList, getCurrentContributorData} from '../services/Meritocracy';
 
 /*
 TODO:
@@ -44,14 +44,11 @@ class Home extends React.Component {
 
   async componentDidMount() {
     try {
-      this.contibutorList = await getContributorList();
-      this.contibutorList = this.contibutorList.map(prepareOptions);
+      const contributorList = await getFormattedContributorList();
 
-      await this.getContributors();
+      const currentContributor = await getCurrentContributorData();
 
-      this.getCurrentContributorData();
-
-      this.setState({busy: false});
+      this.setState({busy: false, currentContributor, contributorList});
     } catch (e) {
       this.setState({errorMsg: e.message || e});
     }
@@ -80,38 +77,6 @@ class Home extends React.Component {
       errorMsg: '',
       award: 0
     });
-  }
-
-  async getCurrentContributorData(){
-    const currentContributor = await this.getContributor(web3.eth.defaultAccount);
-
-    let praises = [];
-    for(let i = 0; i < currentContributor.praiseNum; i++){
-      praises.push(Meritocracy.methods.getStatus(web3.eth.defaultAccount, i).call());
-    }
-
-    const contribData = this.contibutorList.find(x => x.value === web3.eth.defaultAccount);
-    if(contribData) currentContributor.name = contribData.label;
-
-    currentContributor.praises = await Promise.all(praises);
-    currentContributor.allocation = web3.utils.fromWei(currentContributor.allocation, "ether");
-    currentContributor.totalForfeited = web3.utils.fromWei(currentContributor.totalForfeited, "ether");
-    currentContributor.totalReceived = web3.utils.fromWei(currentContributor.totalReceived, "ether");
-    currentContributor.received = web3.utils.fromWei(currentContributor.received, "ether");
-
-    this.setState({currentContributor});
-  }
-
-  async getContributor(_address) {
-    const contributor = await Meritocracy.methods.contributors(_address).call();
-    contributor.praiseNum = await Meritocracy.methods.getStatusLength(_address).call();
-    return contributor;
-  }
-
-  async getContributors() {
-    const registry = await Meritocracy.methods.getRegistry().call({from: web3.eth.defaultAccount});
-    const contributorList = this.contibutorList.filter(x => registry.includes(x.value) && x.value !== web3.eth.defaultAccount);
-    this.setState({contributorList});
   }
 
   async awardTokens(e) {
@@ -146,7 +111,8 @@ class Home extends React.Component {
       const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
       const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
       this.resetUIFields();
-      this.getCurrentContributorData();
+      const currentContributor = await getCurrentContributorData();
+      this.setState({currentContributor});
     } catch(e) {
       this.setState({errorMsg: 'tx failed? got enough tokens to award?'});
       console.error(e);
@@ -177,7 +143,8 @@ class Home extends React.Component {
       const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
       const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
 
-      this.getCurrentContributorData();
+      const currentContributor = await getCurrentContributorData();
+      this.setState({currentContributor});
     } catch(e) {
       this.setState({errorMsg: 'tx failed? Did you allocate all your tokens first?'});
       console.error(e);
@@ -237,20 +204,5 @@ class Home extends React.Component {
     </div>);
   }
 }
-
-
-// === Utils ===============================================
-
-const prepareOptions = option => {
-  if(option.value.match(/^0x[0-9A-Za-z]{40}$/)){ // Address
-    option.value = web3.utils.toChecksumAddress(option.value);
-  } else { // ENS Name
-    // TODO: resolve ENS names
-    // EmbarkJS.Names.resolve("ethereum.eth").then(address => {
-    // console.log("the address for ethereum.eth is: " + address);
-    //
-  }
-  return option;
-};
 
 export default Home;

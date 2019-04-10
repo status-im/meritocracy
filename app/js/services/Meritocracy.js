@@ -2,10 +2,12 @@
 import Meritocracy from 'Embark/contracts/Meritocracy';
 import EmbarkJS from 'Embark/EmbarkJS';
 
-const mainAccount = web3.eth.defaultAccount;
+
+let contributorList;
 
 export function addContributor(name, address) {
   return new Promise(async (resolve, reject) => {
+    const mainAccount = web3.eth.defaultAccount;
     try {
       const list = await getContributorList();
       list.push({label: name, value: address});
@@ -34,8 +36,8 @@ export function getContributorList(hash) {
       }
 
       const content = await EmbarkJS.Storage.get(hash);
-      const data = JSON.parse(content);
-      resolve(data);
+      contributorList = JSON.parse(content);
+      resolve(contributorList);
     } catch (e) {
       const message = 'Error getting contributor file on IPFS';
       console.error(message);
@@ -43,6 +45,69 @@ export function getContributorList(hash) {
       reject(message);
     }
   });
+}
+
+export async function getFormattedContributorList(hash) {
+  return new Promise(async (resolve, reject) => {
+    const mainAccount = web3.eth.defaultAccount;
+    try {
+      let list = await getContributorList(hash);
+      list = list.map(prepareOptions);
+
+      const registry = await Meritocracy.methods.getRegistry().call({from: mainAccount});
+      list = list.filter(contributorData => registry.includes(contributorData.value) && contributorData.value !== mainAccount);
+
+      resolve(list);
+    } catch (e) {
+      const message = 'Error getting formatted contributor file on IPFS';
+      console.error(message);
+      console.error(e);
+      reject(message);
+    }
+  });
+}
+
+const prepareOptions = option => {
+  if(option.value.match(/^0x[0-9A-Za-z]{40}$/)){ // Address
+    option.value = web3.utils.toChecksumAddress(option.value);
+  } else { // ENS Name
+    // TODO: resolve ENS names
+    // EmbarkJS.Names.resolve("ethereum.eth").then(address => {
+    // console.log("the address for ethereum.eth is: " + address);
+    //
+  }
+  return option;
+};
+
+export async function getCurrentContributorData(){
+  const mainAccount = web3.eth.defaultAccount;
+  const currentContributor = await getContributor(mainAccount);
+
+  let praises = [];
+  for(let i = 0; i < currentContributor.praiseNum; i++){
+    praises.push(Meritocracy.methods.getStatus(mainAccount, i).call());
+  }
+
+  if (!contributorList) {
+    await getContributorList();
+  }
+
+  const contribData = contributorList.find(x => x.value === mainAccount);
+  if(contribData) currentContributor.name = contribData.label;
+
+  currentContributor.praises = await Promise.all(praises);
+  currentContributor.allocation = web3.utils.fromWei(currentContributor.allocation, "ether");
+  currentContributor.totalForfeited = web3.utils.fromWei(currentContributor.totalForfeited, "ether");
+  currentContributor.totalReceived = web3.utils.fromWei(currentContributor.totalReceived, "ether");
+  currentContributor.received = web3.utils.fromWei(currentContributor.received, "ether");
+
+  return currentContributor;
+}
+
+export async function getContributor(_address) {
+  const contributor = await Meritocracy.methods.contributors(_address).call();
+  contributor.praiseNum = await Meritocracy.methods.getStatusLength(_address).call();
+  return contributor;
 }
 
 export function saveContributorList(list) {
