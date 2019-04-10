@@ -3,9 +3,6 @@ import Meritocracy from 'Embark/contracts/Meritocracy';
 import EmbarkJS from 'Embark/EmbarkJS';
 import axios from 'axios';
 
-const IPFS_HASH = 'QmfWJJYFBJReu2rzTDzkBKXHazE52GVWrTcVNKdcupnxNH';
-const IPNS_HASH = 'QmPW4ZGXXvVYxC7Uez62m9yYZZYVHmo98c8rP6Hu1nb1Na';
-
 const mainAccount = web3.eth.defaultAccount;
 
 export function addContributor(name, address) {
@@ -34,16 +31,14 @@ export function addContributor(name, address) {
   });
 }
 
-export function getContributorList() {
+export function getContributorList(hash) {
   return new Promise(async (resolve, reject) => {
     try {
-      // TODO figure out how to make IPFS/IPNS work
-      const hash = await EmbarkJS.Storage.resolve(IPNS_HASH, (err, hash) => {
-        console.log('Resolved??', {err, hash});
-      });
-      console.log({hash});
+      if (!hash) {
+        hash = await Meritocracy.methods.contributorListIPFSHash().call();
+      }
+
       const url = await EmbarkJS.Storage.getUrl(hash);
-      console.log({url});
       const response = await axios.get(url);
       resolve(response.data.contributors);
     } catch (e) {
@@ -72,3 +67,4 @@ export function saveContributorList(list) {
     }
   });
 }
+
