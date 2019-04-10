@@ -49,7 +49,7 @@ contract Meritocracy {
     uint256 public maxContributors; // Dynamic finite limit on registry.
     mapping(address => bool) public admins;
     mapping(address => Contributor) public contributors;
-    string public contributorListIPFSHash;
+    bytes public contributorListIPFSHash;
 
     Meritocracy public previousMeritocracy; // Reference and read from previous contract
 
@@ -191,7 +191,7 @@ contract Meritocracy {
     // Admin Functions  -------------------------------------------------------------------------------------
 
     // Add Contributor to Registry
-    function addContributor(address _contributor, string memory _contributorListIPFSHash) public onlyAdmin {
+    function addContributor(address _contributor, bytes memory _contributorListIPFSHash) public onlyAdmin {
        addContributorWithoutHash(_contributor);
 
         // Set new IPFS hash for the list
@@ -210,7 +210,7 @@ contract Meritocracy {
     }
 
     // Add Multiple Contributors to the Registry in one tx
-    function addContributors(address[] calldata _newContributors, string calldata _contributorListIPFSHash) external onlyAdmin {
+    function addContributors(address[] calldata _newContributors, bytes calldata _contributorListIPFSHash) external onlyAdmin {
         // Locals
         uint256 newContributorLength = _newContributors.length;
         // Requirements
@@ -226,7 +226,7 @@ contract Meritocracy {
     // Remove Contributor from Registry
     // Note: Should not be easy to remove multiple contributors in one tx
     // WARN: Changed to idx, client can do loop by enumerating registry
-    function removeContributor(uint256 idx, string calldata _contributorListIPFSHash) external onlyAdmin { // address _contributor
+    function removeContributor(uint256 idx, bytes calldata _contributorListIPFSHash) external onlyAdmin { // address _contributor
         // Locals
         uint256 registryLength = registry.length - 1;
         // Requirements
@@ -340,7 +340,7 @@ contract Meritocracy {
     // }
 
     // Set Owner, Token address,  initial maxContributors
-    constructor(address _token, uint256 _maxContributors, string memory _contributorListIPFSHash) public {
+    constructor(address _token, uint256 _maxContributors, bytes memory _contributorListIPFSHash) public {
         // Body
         owner = msg.sender;
         addAdmin(owner);

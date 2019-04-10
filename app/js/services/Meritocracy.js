@@ -14,7 +14,7 @@ export function addContributor(name, address) {
 
       const newHash = await saveContributorList(list);
 
-      const addContributor = Meritocracy.methods.addContributor(address, newHash);
+      const addContributor = Meritocracy.methods.addContributor(address, web3.utils.toHex(newHash));
       let gas = await addContributor.estimateGas({from: mainAccount});
       const receipt = await addContributor.send({from: mainAccount, gas: gas + 1000});
 
@@ -41,7 +41,7 @@ export function removeContributor(address) {
 
       const newHash = await saveContributorList(list);
 
-      const removeContributor = Meritocracy.methods.removeContributor(index, newHash);
+      const removeContributor = Meritocracy.methods.removeContributor(index, web3.utils.toHex(newHash));
       let gas = await removeContributor.estimateGas({from: mainAccount});
       const receipt = await removeContributor.send({from: mainAccount, gas: gas + 1000});
 
@@ -60,6 +60,7 @@ export function getContributorList(hash) {
     try {
       if (!hash) {
         hash = await Meritocracy.methods.contributorListIPFSHash().call();
+        hash = web3.utils.hexToAscii(hash);
       }
 
       const content = await EmbarkJS.Storage.get(hash);

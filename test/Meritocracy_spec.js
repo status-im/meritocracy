@@ -8,7 +8,7 @@ let owner;
 let admins;
 let ownerInitTokens;
 
-const IPFS_HASH = 'QmfWJJYFBJReu2rzTDzkBKXHazE52GVWrTcVNKdcupnxNH';
+const IPFS_HASH = web3.utils.toHex('QmREHBNWoJCx8KDz7PBAThv8mrxGRWimbzqZsL8aDzfLHW');
 
 // For documentation please see https://embark.status.im/docs/contracts_testing.html
 config({

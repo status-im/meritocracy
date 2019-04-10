@@ -8,7 +8,7 @@ function getContributors () {
    return addresses;
 }
 
-const OG_IPFS_HASH = 'QmREHBNWoJCx8KDz7PBAThv8mrxGRWimbzqZsL8aDzfLHW';
+const OG_IPFS_HASH = '0x516d524548424e576f4a4378384b447a37504241546876386d7278475257696d627a715a734c3861447a664c4857';
 
 module.exports = {
   // default applies to all environments
