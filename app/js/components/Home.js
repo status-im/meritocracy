@@ -1,12 +1,10 @@
 /*global web3*/
 import React from 'react';
-import {Button, Grid, Row, Col, Alert } from 'react-bootstrap';
-import * as NumericInput from 'react-numeric-input';
+import {Row, Col, Alert, Button, Container, Form} from 'react-bootstrap';
+import NumericInput from 'react-numeric-input';
 import Select from 'react-select';
 
 import Meritocracy from 'Embark/contracts/Meritocracy';
-
-// import './css/dapp.css';
 
 /*
 TODO:
@@ -189,8 +187,6 @@ class Home extends React.Component {
     const maxAllocation = selectedContributors.length ? currentContributor.allocation / selectedContributors.length : 0;
 
     return (<div>
-      <h3>Status Meritocracy</h3>
-
       {errorMsg && <Alert bsStyle="danger">{errorMsg}</Alert>}
 
       {currentContributor.name &&  <h2>Hello, {currentContributor.name} !</h2>}
@@ -206,27 +202,31 @@ class Home extends React.Component {
           placeholder="Choose Contributor(s)..."
           isDisabled={busy}
         />
-      <span>Your Allocatable Kudos: { currentContributor.allocation } SNT</span> <br/>
+      <p>Your Allocatable Kudos: { currentContributor.allocation } SNT</p>
 
+      {selectedContributors.length === 0 && <Alert variant="warning">
+        Please select one or more contributors
+      </Alert>}
 
-      <br/>
-      <NumericInput mobile step={5} min={0} max={maxAllocation} onChange={this.handleAwardChange} value={award} disabled={busy} />  <br/>
+      <NumericInput mobile step={5} min={0} max={maxAllocation} onChange={this.handleAwardChange} value={award} disabled={busy}/>
 
-      <input disabled={busy} placeholder="Enter your praise..." onChange={this.handlePraiseChange} value={praise} />  <br/>
+      <Form>
+        <Form.Control disabled={busy} placeholder="Enter your praise..." onChange={this.handlePraiseChange}
+                      value={praise} />
+      </Form>
       <span> Total Awarding: {award * selectedContributors.length} SNT </span>   <br/>
       <Button disabled={busy} variant="outline-primary" onClick={this.awardTokens}>Award</Button>
 
-
       <h4>Your Kudos History</h4>
-      <span>Your Received Kudos: <b>{ currentContributor.received } SNT</b> <Button variant="outline-primary"  onClick={this.withdrawTokens} disabled={busy}>Withdraw</Button></span>  <br/>
-      <Grid>
+      <span>Your Received Kudos: <b>{ currentContributor.received } SNT</b> <Button variant="outline-primary" onClick={this.withdrawTokens} disabled={busy}>Withdraw</Button></span>  <br/>
+      <Container>
         <Row>
           {currentContributor.praises && currentContributor.praises.map((item, i) => {
             const name = options.find(x => x.value === item.author);
             return <Col key={i}>{(name && name.label) || item.author} has sent you {web3.utils.fromWei(item.amount, "ether")} SNT {item.praise && "\"" + item.praise + "\""}</Col>;
           })}
         </Row>
-      </Grid>
+      </Container>
 
     </div>);
   }

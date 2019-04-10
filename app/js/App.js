@@ -1,10 +1,13 @@
 /*global web3*/
-import React from 'react';
+import React, {Fragment} from 'react';
 import {HashRouter, Route, Redirect, Switch} from "react-router-dom";
+import ThemeProvider from 'react-bootstrap/ThemeProvider';
 
 import EmbarkJS from 'Embark/EmbarkJS';
 
+import Header from './components/Header';
 import Home from './components/Home';
+import Admin from './components/Admin';
 
 const MAINNET = 1;
 const TESTNET = 3;
@@ -50,11 +53,15 @@ class App extends React.Component {
     }
 
     return (<HashRouter>
+      <ThemeProvider prefixes={{ btn: 'my-btn' }}>
+        <Header/>
         <Switch>
           <Route exact path="/" component={Home}/>
+          <Route exact path="/admin" component={Admin}/>
 
           <Redirect to="/404"/>
         </Switch>
+      </ThemeProvider>
     </HashRouter>);
   }
 }
