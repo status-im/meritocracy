@@ -5,6 +5,7 @@ const contributors = [
   { 'label' : 'barry', 'value' : '0xa46b0546481a04b7de049a8a20f8a9b2b2c5cc05' }, 
   { 'label' : 'BrianXV', 'value' : '0x03b832b3fa819d7a4b6c819e4df1e60a173e739a' },
   { 'label' : 'cammellos', 'value' : '0xd0ec8a940fe9712c1521c2190f41604ecaa7ec9e' }, 
+  { 'label' : 'Carl', 'value': '0x9fb937ab76b68dae29e3de20cf797d44f00e6410'}, 
   { 'label' : 'ceri', 'value' : '0x68f47e153e1aa7d6529e078feff86eada87ddee3' }, 
   { 'label' : 'Dani', 'value' : '0x89c010bc7085eb150b66582f13681f9e36904bea' }, 
   { 'label' : 'dmitryn', 'value' : '0x6b0d7ba67aa3d84122749dc7906b8e7f25ed1af8' }, 
