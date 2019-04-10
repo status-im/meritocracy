@@ -1,8 +1,11 @@
 import React from 'react'
 import {Navbar, Nav} from 'react-bootstrap';
 
-const Header = () => (<Navbar bg="light" expand="lg">
-    <Navbar.Brand href="/#/">Status Meritocracy</Navbar.Brand>
+import './header.scss'
+import logo from '../../images/logo.png';
+
+const Header = () => (<Navbar expand="lg" className="header border-bottom mb-3">
+    <Navbar.Brand href="/#/"><img alt="Logo" src={logo} className="mr-3"/>Status Meritocracy</Navbar.Brand>
     <Navbar.Toggle aria-controls="basic-navbar-nav"/>
     <Navbar.Collapse id="basic-navbar-nav">
       <Nav className="mr-auto">
