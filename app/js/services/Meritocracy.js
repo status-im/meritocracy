@@ -1,7 +1,6 @@
 /*global web3*/
 import Meritocracy from 'Embark/contracts/Meritocracy';
 import EmbarkJS from 'Embark/EmbarkJS';
-import axios from 'axios';
 
 const mainAccount = web3.eth.defaultAccount;
 
