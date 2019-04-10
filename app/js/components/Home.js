@@ -53,7 +53,7 @@ class Home extends React.Component {
 
       this.setState({busy: false});
     } catch (e) {
-      this.setState({errorMessage: e.message || e});
+      this.setState({errorMsg: e.message || e});
     }
   }
 
@@ -192,7 +192,7 @@ class Home extends React.Component {
     const maxAllocation = selectedContributors.length ? currentContributor.allocation / selectedContributors.length : 0;
 
     return (<div>
-      {errorMsg && <Alert bsStyle="danger">{errorMsg}</Alert>}
+      {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
       {busy && <p>Working...</p>}
 
       {currentContributor.name &&  <h2>Hello, {currentContributor.name} !</h2>}

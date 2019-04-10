@@ -12,7 +12,8 @@ class Admin extends React.Component {
     contributorName: '',
     contributorAddress: '',
     busy: false,
-    error: ''
+    error: '',
+    successMsg: ''
   };
 
   onChange = (name, e) => {
@@ -21,10 +22,10 @@ class Admin extends React.Component {
 
   addContributor = async (e) => {
     e.preventDefault();
-    this.setState({busy: true});
+    this.setState({busy: true, successMsg: ''});
     try {
       await addContributor(this.state.contributorName, this.state.contributorAddress);
-      this.setState({contributorName: '', contributorAddress: '', busy: false});
+      this.setState({busy: false, successMsg: 'Contributor added!'});
     } catch (e) {
       this.setState({error: e.message || e, busy: false});
     }
@@ -36,6 +37,7 @@ class Admin extends React.Component {
     return (<div>
       <h2>Admin Panel</h2>
       {error && <Alert variant="danger">{error}</Alert>}
+      {successMsg && <Alert variant="success">{successMsg}</Alert>}
       {busy && <Alert variant="primary">Working...</Alert>}
       <h3>Add a contributor</h3>
       <ValidatedForm onSubmit={(e) => this.addContributor(e)}>

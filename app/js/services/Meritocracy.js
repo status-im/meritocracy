@@ -8,20 +8,16 @@ const mainAccount = web3.eth.defaultAccount;
 export function addContributor(name, address) {
   return new Promise(async (resolve, reject) => {
     try {
-      const addContributor = Meritocracy.methods.addContributor(address);
-      let gas = await addContributor.estimateGas({from: mainAccount});
-      console.log({gas});
-      const receipt = await addContributor.send({from: mainAccount, gas: gas + 1000});
-
-      console.log({receipt});
-
       const list = await getContributorList();
       list.push({label: name, value: address});
-      console.log({list});
 
-      await saveContributorList(list);
+      const newHash = await saveContributorList(list);
 
-      resolve();
+      const addContributor = Meritocracy.methods.addContributor(address, newHash);
+      let gas = await addContributor.estimateGas({from: mainAccount});
+      const receipt = await addContributor.send({from: mainAccount, gas: gas + 1000});
+
+      resolve(receipt);
     } catch (e) {
       const message = 'Error adding contributor';
       console.error(message);
@@ -38,9 +34,9 @@ export function getContributorList(hash) {
         hash = await Meritocracy.methods.contributorListIPFSHash().call();
       }
 
-      const url = await EmbarkJS.Storage.getUrl(hash);
-      const response = await axios.get(url);
-      resolve(response.data.contributors);
+      const content = await EmbarkJS.Storage.get(hash);
+      const data = JSON.parse(content);
+      resolve(data);
     } catch (e) {
       const message = 'Error getting contributor file on IPFS';
       console.error(message);
@@ -53,12 +49,8 @@ export function getContributorList(hash) {
 export function saveContributorList(list) {
   return new Promise(async (resolve, reject) => {
     try {
-      const url = await EmbarkJS.Storage.getUrl(IPNS_HASH);
-      console.log('Url', url);
-      console.log('saving', {contributors: list});
-      const response = await axios.post(url, {contributors: list});
-      console.log(response.data);
-      resolve(response.data.contributors);
+      const newHash = await EmbarkJS.Storage.saveText(JSON.stringify(list));
+      resolve(newHash);
     } catch (e) {
       const message = 'Error saving contributor file on IPFS';
       console.error(message);
