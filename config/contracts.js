@@ -8,6 +8,7 @@ function getContributors () {
    return addresses;
 }
 
+const OG_IPFS_HASH = 'QmfWJJYFBJReu2rzTDzkBKXHazE52GVWrTcVNKdcupnxNH';
 
 module.exports = {
   // default applies to all environments
@@ -82,7 +83,7 @@ module.exports = {
         ]
       },
       "Meritocracy": {
-        "args": [ "$SNT", 66]
+        "args": ["$SNT", 66, OG_IPFS_HASH]
       }
     }
   },

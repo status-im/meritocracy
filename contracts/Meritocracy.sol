@@ -49,6 +49,7 @@ contract Meritocracy {
     uint256 public maxContributors; // Dynamic finite limit on registry.
     mapping(address => bool) public admins;
     mapping(address => Contributor) public contributors;
+    string public contributorListIPFSHash;
 
     Meritocracy public previousMeritocracy; // Reference and read from previous contract
 
@@ -88,7 +89,7 @@ contract Meritocracy {
     // Split amount over each contributor in registry, any contributor can allocate? TODO maybe relax this restriction, so anyone can allocate tokens
     function allocate(uint256 _amount) external {
         // Locals
-        
+
         // Contributor memory cAllocator = contributors[msg.sender];
         // Requirements
         // require(cAllocator.addr != address(0)); // is sender a Contributor? TODO maybe relax this restriction.
@@ -96,9 +97,9 @@ contract Meritocracy {
 
         // removing decimals
         individualAmount = (individualAmount / 1 ether * 1 ether);
-        
+
         uint amount = individualAmount * registry.length;
-        
+
         require(token.transferFrom(msg.sender, address(this), amount));
         // Body
         // cAllocator.inPot = true;
@@ -137,7 +138,7 @@ contract Meritocracy {
         Contributor storage cReceiver = contributors[_contributor];
         // Requirements
         require(_amount > 0); // Allow Non-Zero amounts only
-        require(cSender.addr == msg.sender); // Ensure Contributors both exist, and isn't the same address 
+        require(cSender.addr == msg.sender); // Ensure Contributors both exist, and isn't the same address
         require(cReceiver.addr == _contributor);
         require(cSender.addr != cReceiver.addr); // cannot send to self
         require(cSender.allocation >= _amount); // Ensure Sender has enough tokens to allocate
@@ -173,7 +174,7 @@ contract Meritocracy {
         time = contributors[_contributor].status[_index].time;
     }
 
-    // Allow Contributor to award multiple Contributors 
+    // Allow Contributor to award multiple Contributors
     function awardContributors(address[] calldata _contributors, uint256 _amountEach,  string calldata _praise) external {
         // Locals
         Contributor storage cSender = contributors[msg.sender];
@@ -190,7 +191,14 @@ contract Meritocracy {
     // Admin Functions  -------------------------------------------------------------------------------------
 
     // Add Contributor to Registry
-    function addContributor(address _contributor) public onlyAdmin {
+    function addContributor(address _contributor, string memory _contributorListIPFSHash) public onlyAdmin {
+       addContributorWithoutHash(_contributor);
+
+        // Set new IPFS hash for the list
+        contributorListIPFSHash = _contributorListIPFSHash;
+    }
+
+    function addContributorWithoutHash(address _contributor) internal onlyAdmin {
         // Requirements
         require(registry.length + 1 <= maxContributors); // Don't go out of bounds
         require(contributors[_contributor].addr == address(0)); // Contributor doesn't exist
@@ -202,15 +210,17 @@ contract Meritocracy {
     }
 
     // Add Multiple Contributors to the Registry in one tx
-    function addContributors(address[] calldata _newContributors ) external onlyAdmin {
+    function addContributors(address[] calldata _newContributors, string calldata _contributorListIPFSHash) external onlyAdmin {
         // Locals
         uint256 newContributorLength = _newContributors.length;
         // Requirements
         require(registry.length + newContributorLength <= maxContributors); // Don't go out of bounds
         // Body
         for (uint256 i = 0; i < newContributorLength; i++) {
-                addContributor(_newContributors[i]);
+            addContributorWithoutHash(_newContributors[i]);
         }
+        // Set new IPFS hash for the list
+        contributorListIPFSHash = _contributorListIPFSHash;
     }
 
     // Remove Contributor from Registry
@@ -245,7 +255,7 @@ contract Meritocracy {
         // Requirements
         require(block.timestamp >= lastForfeit + 1 weeks); // prevents admins accidently calling too quickly.
         // Body
-        lastForfeit = block.timestamp; 
+        lastForfeit = block.timestamp;
         for (uint256 i = 0; i < registryLength; i++) { // should never be longer than maxContributors, see addContributor
                 Contributor storage c = contributors[registry[i]];
                 c.totalForfeited += c.allocation; // Shaaaaame!
@@ -288,8 +298,8 @@ contract Meritocracy {
                 uint256 r =  c.received;
                 c.received = 0;
                 c.allocation = 0;
-                // WARN: Should totalReceived and totalForfeited be zeroed-out? 
-                token.transfer(c.addr, r); // Transfer any owed tokens to contributor 
+                // WARN: Should totalReceived and totalForfeited be zeroed-out?
+                token.transfer(c.addr, r); // Transfer any owed tokens to contributor
         }
         lastForfeit = block.timestamp;
         token = ERC20Token(_token);
@@ -324,17 +334,18 @@ contract Meritocracy {
     // Constructor ------------------------------------------------------------------------------------------
 
     // constructor(address _token, uint256 _maxContributors, address _previousMeritocracy) public {
-        
+
     // }
 
     // Set Owner, Token address,  initial maxContributors
-    constructor(address _token, uint256 _maxContributors) public {
+    constructor(address _token, uint256 _maxContributors, string memory _contributorListIPFSHash) public {
         // Body
         owner = msg.sender;
         addAdmin(owner);
         lastForfeit = block.timestamp;
         token = ERC20Token(_token);
         maxContributors= _maxContributors;
+        contributorListIPFSHash = _contributorListIPFSHash;
         // previousMeritocracy = Meritocracy(_previousMeritocracy);
         // importPreviousMeritocracyData() TODO
     }
