@@ -28,6 +28,33 @@ export function addContributor(name, address) {
   });
 }
 
+export function removeContributor(address) {
+  return new Promise(async (resolve, reject) => {
+    const mainAccount = web3.eth.defaultAccount;
+    try {
+      const registry = await Meritocracy.methods.getRegistry().call({from: mainAccount});
+      let index = registry.indexOf(address);
+
+      const list = await getContributorList();
+      const idx = list.findIndex(contributor => contributor.value === address);
+      list.splice(idx, 1);
+
+      const newHash = await saveContributorList(list);
+
+      const removeContributor = Meritocracy.methods.removeContributor(index, newHash);
+      let gas = await removeContributor.estimateGas({from: mainAccount});
+      const receipt = await removeContributor.send({from: mainAccount, gas: gas + 1000});
+
+      resolve(receipt);
+    } catch (e) {
+      const message = 'Error removing contributor';
+      console.error(message);
+      console.error(e);
+      reject(message);
+    }
+  });
+}
+
 export function getContributorList(hash) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -68,7 +95,7 @@ export async function getFormattedContributorList(hash) {
 }
 
 const prepareOptions = option => {
-  if(option.value.match(/^0x[0-9A-Za-z]{40}$/)){ // Address
+  if (option.value.match(/^0x[0-9A-Za-z]{40}$/)) { // Address
     option.value = web3.utils.toChecksumAddress(option.value);
   } else { // ENS Name
     // TODO: resolve ENS names
@@ -113,6 +140,7 @@ export async function getContributor(_address) {
 export function saveContributorList(list) {
   return new Promise(async (resolve, reject) => {
     try {
+      contributorList = list;
       const newHash = await EmbarkJS.Storage.saveText(JSON.stringify(list));
       resolve(newHash);
     } catch (e) {

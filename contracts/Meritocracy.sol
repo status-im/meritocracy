@@ -230,7 +230,7 @@ contract Meritocracy {
         // Locals
         uint256 registryLength = registry.length - 1;
         // Requirements
-        require(idx < registryLength); // idx needs to be smaller than registry.length - 1 OR maxContributors
+        require(idx <= registryLength); // idx needs to be smaller than registry.length - 1 OR maxContributors
         // Body
         address c = registry[idx];
         // Swap & Pop!

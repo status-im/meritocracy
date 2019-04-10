@@ -7,7 +7,7 @@ import {required, isAddress} from '../validators';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTrash} from "@fortawesome/free-solid-svg-icons";
 
-import {addContributor, getFormattedContributorList} from '../services/Meritocracy';
+import {addContributor, getFormattedContributorList, removeContributor} from '../services/Meritocracy';
 
 import './admin.scss';
 
@@ -42,6 +42,10 @@ class Admin extends React.Component {
     this.setState({busy: true, successMsg: ''});
     try {
       await addContributor(this.state.contributorName, this.state.contributorAddress);
+
+      const contributorList = this.state.contributorList;
+      contributorList.push({label: this.state.contributorName, value: this.state.contributorAddress});
+
       this.setState({busy: false, successMsg: 'Contributor added!'});
     } catch (e) {
       this.setState({error: e.message || e, busy: false});
@@ -53,8 +57,19 @@ class Admin extends React.Component {
     this.setState({focusedContributorIndex: contributorIndex, showDeleteModal: true});
   };
 
-  doRemove = () => {
-    this.setState({focusedContributorIndex: -1, showDeleteModal: false});
+  doRemove = async () => {
+    const idx = this.state.focusedContributorIndex;
+    this.setState({focusedContributorIndex: -1, showDeleteModal: false, busy: true});
+    try {
+      await removeContributor(this.state.contributorList[idx].value);
+
+      const contributorList = this.state.contributorList;
+      contributorList.splice(idx, 1);
+
+      this.setState({contributorList, busy: false, successMsg: 'Contributor removed!'});
+    } catch (e) {
+      this.setState({error: e.message || e, busy: false});
+    }
   };
 
   handleClose = () => {
