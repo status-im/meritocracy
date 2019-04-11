@@ -153,3 +153,17 @@ export function saveContributorList(list) {
   });
 }
 
+export function isAdmin(address) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await Meritocracy.methods.admins(address).call();
+      resolve(result);
+    } catch (e) {
+      const message = 'Could not get status of user';
+      console.error(message);
+      console.error(e);
+      reject(message);
+    }
+  });
+}
+

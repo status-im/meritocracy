@@ -107,8 +107,8 @@ class Admin extends React.Component {
       <h3>Contributor List</h3>
       <ListGroup>
         {contributorList.map((contributor, idx) => (
-          <ListGroup.Item key={contributor.value} action>
-            {contributor.label}: {contributor.value}
+          <ListGroup.Item key={contributor.value} action className="contributor-item">
+            <span className="font-weight-bold">{contributor.label}:</span> {contributor.value}
 
             <div className="contributor-controls float-right">
               <OverlayTrigger placement="top"

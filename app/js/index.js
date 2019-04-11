@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 
 import App from './App';
 
-import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../css/fonts/Inter/inter.css';
+import '../css/bootstrap-overrides.scss';
+import '../css/index.scss';
 
 ReactDOM.render(
     <App/>,

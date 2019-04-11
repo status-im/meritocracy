@@ -1,5 +1,10 @@
-.contributor-controls {
-  .icon {
-    cursor: pointer;
+.contributor-item {
+  overflow: hidden;
+
+  .contributor-controls {
+    .icon {
+      cursor: pointer;
+    }
   }
 }
+

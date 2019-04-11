@@ -1,0 +1,33 @@
+@import "../../css/variable-overrides";
+
+.home-tabs.nav-tabs {
+  border: none;
+
+  .nav-link {
+    border: none;
+    color: $dark;
+    border-bottom: 2px solid $dark;
+    font-size: 17px;
+    width: 48%;
+    text-align: center;
+
+    &.active {
+      color: $primary;
+      border-color: $primary;
+    }
+
+    &+.nav-link {
+      margin-left: 4%;
+    }
+  }
+}
+
+.reward-panel {
+  .allocation {
+    font-size: 32px;
+  }
+
+  .react-numeric-input {
+
+  }
+}
