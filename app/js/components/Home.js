@@ -160,6 +160,12 @@ class Home extends React.Component {
 
     const maxAllocation = selectedContributors.length ? currentContributor.allocation / selectedContributors.length : 0;
 
+    const orderedContributors = contributorList.sort((a,b) => {
+      if (a.label < b.label) return -1;
+      if (a.label > b.label) return 1;
+      return 0;
+    });
+
     return (<Fragment>
       {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
       {busy && <p>Working...</p>}
@@ -176,7 +182,7 @@ class Home extends React.Component {
             isMulti
             value={selectedContributors}
             onChange={this.handleContributorSelection}
-            options={contributorList}
+            options={orderedContributors}
             placeholder="Choose Contributor(s)..."
             isDisabled={busy}
             className="mb-2"
