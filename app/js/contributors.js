@@ -13,7 +13,7 @@ const contributors = [
   { 'label' : 'guylouis.stateofus.eth', 'value' : '0x6913f3bdbb7c303977d6244c0e0071b4ebc6f359' }, 
   { 'label' : 'Hester', 'value' : '0x8c4f71b3cf6a76de2cc239a6fa84e1a80e589598' }, 
   { 'label' : 'Hutch', 'value' : '0x34a4b73100d11815ee4bb0ebcc86ba5824b12134' }, 
-  { 'label' : 'igor.stateofus.eth', 'value' : '0x6a069D627BAA9a627D79D2097EC979E2c58F1984' }, 
+  { 'label' : 'igor.stateofus.eth', 'value' : '0xff91043525391cd3a316450bc80ef874fb0ef446' }, 
   { 'label' : 'jakubgs.eth',  'value' : '0x9b64770c9485A5188D238C305E53627A67C05D7D'},
   { 'label' : 'Jinho', 'value' : '0x7407bF49004ee99d9B2caA2fb90B476bfF2DbCaf' }, 
   { 'label' : 'Jonathan Barker',    'value' : '0xf23d05F375A8367b150f7Ad1A37DFd9E3c35eE56' }, 
