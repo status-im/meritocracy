@@ -23,11 +23,17 @@
 }
 
 .reward-panel {
+  padding-bottom: 70px;
+
   .allocation {
     font-size: 32px;
   }
 
-  .react-numeric-input {
+  .TOC {
+    font-size: 15px;
+  }
 
+  .small-text {
+    font-size: 13px;
   }
 }

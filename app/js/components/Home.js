@@ -1,14 +1,14 @@
 /*global web3*/
 import React, {Fragment} from 'react';
 import {Row, Col, Alert, Button, Container, Form, Tabs, Tab} from 'react-bootstrap';
-import NumericInput from 'react-numeric-input';
-import Select from 'react-select';
-
 import Meritocracy from 'Embark/contracts/Meritocracy';
-
+import arrowLeft from '../../images/arrow-left.svg';
 import {getFormattedContributorList, getCurrentContributorData} from '../services/Meritocracy';
-
 import './home.scss';
+import Step1 from './Step1';
+import Loading from './Loading';
+import Complete from './Complete';
+import Error from './Error';
 
 /*
 TODO:
@@ -31,7 +31,9 @@ class Home extends React.Component {
       status: []
     },
     award: 0,
-    praise: ''
+    praise: '',
+    step: 'ERROR',
+    checkbox: false,
   };
 
   constructor(props) {
@@ -57,19 +59,40 @@ class Home extends React.Component {
   }
 
   handleContributorSelection(_selectedContributors) {
-    this.setState({ selectedContributors: _selectedContributors });
+    this.setState({ selectedContributors: _selectedContributors }, () => {
+      this._setAward(this.state.award);
+    });
   }
 
-  handleAwardChange(_amount) {
-    const { currentContributor: {allocation}, selectedContributors} = this.state;
+  handleAwardChange(e) {
+    if(e.target.value.trim() === "") {
+      this.setState({award: ""});
+      return;
+    }
+    this._setAward(e.target.value);
+  }
 
-    const maxAllocation = allocation / selectedContributors.length;
+  handlePlus5 = () => {
+    this._setAward(this.state.award + 5);
+  }
+  
+  _setAward = (value) => {
+    let _amount = parseInt(value, 10);
+    if(_amount < 0 || isNaN(_amount)) _amount = 0;
+    
+    const { currentContributor: {allocation}, selectedContributors} = this.state;
+    const maxAllocation = selectedContributors.length ? Math.floor(allocation / selectedContributors.length) : 0;
     const award = (_amount <=  maxAllocation ? _amount : maxAllocation );
+
     this.setState({award});
   }
 
   handlePraiseChange(e) {
     this.setState({ praise: e.target.value });
+  }
+
+  handleCheckbox = (e) => {
+    this.setState(prevState => ({ checkbox: !prevState.checkbox }));
   }
 
   resetUIFields(){
@@ -84,11 +107,7 @@ class Home extends React.Component {
   async awardTokens(e) {
     const {award, selectedContributors, praise} = this.state;
 
-    // TODO some sanity checks
-    if(award <= 0) {
-      this.setState({errorMsg: 'amount must be more than 0'});
-      return;
-    }
+    this.moveStep('BUSY');
 
     let addresses = selectedContributors.map(a => a.value);
 
@@ -108,18 +127,17 @@ class Home extends React.Component {
     }
 
     try {
-      this.setState({busy: true});
-
       const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
       const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
       this.resetUIFields();
       const currentContributor = await getCurrentContributorData();
       this.setState({currentContributor});
+      this.moveStep('COMPLETE')();
     } catch(e) {
       this.setState({errorMsg: 'tx failed? got enough tokens to award?'});
       console.error(e);
     } finally {
-      this.setState({busy: false});
+      
     }
   }
 
@@ -147,6 +165,7 @@ class Home extends React.Component {
 
       const currentContributor = await getCurrentContributorData();
       this.setState({currentContributor});
+      
     } catch(e) {
       this.setState({errorMsg: 'tx failed? Did you allocate all your tokens first?'});
       console.error(e);
@@ -155,79 +174,90 @@ class Home extends React.Component {
     }
   }
 
+
+  moveStep = nexStep => () => {
+    this.setState({step: nexStep});
+  }
+
+
   render() {
-    const { selectedContributors, contributorList, award, currentContributor, praise, busy, errorMsg } = this.state;
+    const { selectedContributors, contributorList, award, currentContributor, praise, busy, errorMsg, step, checkbox } = this.state;
 
-    const maxAllocation = selectedContributors.length ? currentContributor.allocation / selectedContributors.length : 0;
+    if(errorMsg) return <Error title="Error" value={errorMsg} />;
 
-    const orderedContributors = contributorList.sort((a,b) => {
-      if (a.label < b.label) return -1;
-      if (a.label > b.label) return 1;
-      return 0;
-    });
+    return (
+      <Fragment>
+        <Tabs defaultActiveKey="reward" className="home-tabs mb-3">
+          <Tab eventKey="reward" title="Reward" className="reward-panel">
+            
+            {step === 'HOME' && (
+              <Step1
+                allocation={currentContributor.allocation}
+                onChangeAward={this.handleAwardChange}
+                onSelectContributor={this.handleContributorSelection}
+                onClickPlus5={this.handlePlus5}
+                contributorList={contributorList}
+                selectedContributors={selectedContributors}
+                award={award}
+                isChecked={checkbox}
+                onClickCheckbox={this.handleCheckbox}
+                onClickNext={this.moveStep('PRAISE')}
+              />
+            )}
 
-    return (<Fragment>
-      {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-      {busy && <p>Working...</p>}
+            {step === 'PRAISE' && (
+              <div>
+                <p className="text-center mt-5 text-muted">Research shows that a note of praise and learning how much our work helped others, increases motivation.</p>
+                <p className="mb-0">
+                  <span className="font-weight-bold">{ selectedContributors.map(x => x.label).join(', ') }</span>
+                  <span className="float-right text-muted">SNT <b>{award * selectedContributors.length}</b></span>
+                </p>
+                <Form>
+                  <Form.Label className="small-text">Add note</Form.Label>
+                  <Form.Control disabled={busy} as="textarea" rows="5" onChange={this.handlePraiseChange}
+                                    value={praise} className="p-2"/>
+                </Form>
+                <div className="fixed-bottom bg-white">
+                  <Button onClick={this.moveStep('HOME')} variant="link"><img src={arrowLeft} alt="" className="mr-2" /> Back</Button>
+                  <Button disabled={busy} variant="primary" className="float-right mr-2 mb-2" onClick={this.awardTokens}>Award</Button>
+                </div>
+              </div>
+            )}
 
-      <Tabs defaultActiveKey="reward" className="home-tabs mb-3">
-        <Tab eventKey="reward" title="Reward" className="reward-panel">
-          <div className="text-center p-4">
-            <p className="text-muted">Reward Status contributors for all the times they impressed you.</p>
-            <p className="allocation mb-0">{currentContributor.allocation} <span className="text-muted">SNT</span></p>
-            <p className="text-muted">Available</p>
-          </div>
+            { step === 'BUSY' && <Loading /> }
+            { step === 'COMPLETE' && <Complete onClick={this.moveStep('HOME')} /> }
+            { step === 'ERROR' && <Error onClick={this.moveStep('PRAISE')} title="Error" message="Your transaction could not be processed" /> }
+          </Tab>
 
-          <Select
-            isMulti
-            value={selectedContributors}
-            onChange={this.handleContributorSelection}
-            options={orderedContributors}
-            placeholder="Choose Contributor(s)..."
-            isDisabled={busy}
-            className="mb-2"
-          />
+          <Tab eventKey="withdraw" title="Withdraw">
+            <p>Your Total Received Kudos: {currentContributor.totalReceived || 0} SNT</p>
+            <p>Your Total Forfeited Kudos: {currentContributor.totalForfeited || 0} SNT</p>
 
-          {selectedContributors.length === 0 && <Alert variant="secondary">
-            Please select one or more contributors
-          </Alert>}
+            <h4>Your Kudos History</h4>
+            <p>Your Received Kudos: <b>{currentContributor.received} SNT</b></p>
 
-          <NumericInput mobile step={5} min={0} max={maxAllocation} onChange={this.handleAwardChange} value={award}
-                        disabled={busy} className="form-control mb-2"/>
+            <p className="text-center">
+              <Button variant="outline-primary" onClick={this.withdrawTokens} disabled={busy}>
+                Withdraw
+              </Button>
+            </p>
 
-          <Form>
-            <Form.Control disabled={busy} placeholder="Enter your praise..." onChange={this.handlePraiseChange}
-                          value={praise}/>
-          </Form>
-          <p className="text-center"> Total Awarding: {award * selectedContributors.length} SNT </p>
-          <p className="text-center"><Button disabled={busy} variant="outline-primary" onClick={this.awardTokens}>Award</Button></p>
-        </Tab>
+            <Container>
+              <Row>
+                {currentContributor.praises && currentContributor.praises.map((item, i) => {
+                  const name = options.find(x => x.value === item.author);
+                  return <Col key={i}>{(name && name.label) || item.author} has sent
+                    you {web3.utils.fromWei(item.amount, "ether")} SNT {item.praise && "\"" + item.praise + "\""}</Col>;
+                })}
+              </Row>
+            </Container>
 
-        <Tab eventKey="withdraw" title="Withdraw">
-          <p>Your Total Received Kudos: {currentContributor.totalReceived || 0} SNT</p>
-          <p>Your Total Forfeited Kudos: {currentContributor.totalForfeited || 0} SNT</p>
 
-          <h4>Your Kudos History</h4>
-          <p>Your Received Kudos: <b>{currentContributor.received} SNT</b></p>
 
-          <p className="text-center">
-            <Button variant="outline-primary" onClick={this.withdrawTokens} disabled={busy}>
-              Withdraw
-            </Button>
-          </p>
-
-          <Container>
-            <Row>
-              {currentContributor.praises && currentContributor.praises.map((item, i) => {
-                const name = options.find(x => x.value === item.author);
-                return <Col key={i}>{(name && name.label) || item.author} has sent
-                  you {web3.utils.fromWei(item.amount, "ether")} SNT {item.praise && "\"" + item.praise + "\""}</Col>;
-              })}
-            </Row>
-          </Container>
-        </Tab>
-      </Tabs>
-    </Fragment>);
+          </Tab>
+        </Tabs>
+      </Fragment>
+    );
   }
 }
 
