@@ -255,7 +255,7 @@ contract Meritocracy {
         // Locals
         uint256 registryLength = registry.length;
         // Requirements
-        require(block.timestamp >= lastForfeit + 1 weeks); // prevents admins accidently calling too quickly.
+        require(block.timestamp >= lastForfeit + 6 days); // prevents admins accidently calling too quickly.
         // Body
         lastForfeit = block.timestamp;
         for (uint256 i = 0; i < registryLength; i++) { // should never be longer than maxContributors, see addContributor
