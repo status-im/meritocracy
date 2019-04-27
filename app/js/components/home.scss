@@ -37,3 +37,26 @@
     font-size: 13px;
   }
 }
+
+.withdraw-panel {
+  .awarded {
+    font-size: 32px;
+  }
+}
+
+.learn-more {
+  display: flex;
+
+  img {
+    width: 25px;
+    margin: 0 10px 0 0;
+    object-fit: contain;
+    align-self: flex-start;
+  }
+
+  p {
+    flex: 1 1 auto;
+  }
+  
+}
+

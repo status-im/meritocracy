@@ -7,6 +7,6 @@ const Loading = () => (
     <img src={spinner} alt="" className="mt-5" />
     <h5 className="text-muted text-center pr-5 pl-5">Waiting for the confirmation from miners</h5>
   </div>
-)
+);
 
 export default Loading;
