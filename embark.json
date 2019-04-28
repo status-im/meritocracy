@@ -1,9 +1,17 @@
 {
-  "contracts": ["contracts/**"],
+  "contracts": [
+    "contracts/**"
+  ],
   "app": {
-    "css/app.css": ["app/css/**"],
-    "js/app.js": ["app/js/index.js"],
-    "images/": ["app/images/**"],
+    "css/app.css": [
+      "app/css/**"
+    ],
+    "js/app.js": [
+      "app/js/index.js"
+    ],
+    "images/": [
+      "app/images/**"
+    ],
     "index.html": "app/index.html"
   },
   "buildDir": "dist/",
@@ -16,6 +24,9 @@
     "embarkjs-connector-web3": {},
     "embark-solc": {
       "outputBinary": false
+    },
+    "@trailofbits/embark-contract-info": {
+      "flags": ""
     }
   },
   "options": {
