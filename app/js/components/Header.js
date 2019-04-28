@@ -6,7 +6,7 @@ import logo from '../../images/logo.png';
 
 const Header = ({ isUserAdmin }) => (
   <Navbar expand="lg" className="header border-bottom mb-3">
-    <Navbar.Brand href="/#/">
+    <Navbar.Brand href="#/">
       <img alt="Logo" src={logo} className="mr-3" />
       Status Meritocracy
     </Navbar.Brand>
@@ -14,8 +14,8 @@ const Header = ({ isUserAdmin }) => (
     {isUserAdmin && (
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link href="/#/">Home</Nav.Link>
-          <Nav.Link href="/#/admin">Admin</Nav.Link>
+          <Nav.Link href="#/">Home</Nav.Link>
+          <Nav.Link href="#/admin">Admin</Nav.Link>
         </Nav>
       </Navbar.Collapse>
     )}

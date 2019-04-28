@@ -56,12 +56,12 @@ const Withdrawal = ({ totalReceived, allocation, onClick, contributorList, prais
         Withdraw
       </Button>
     </p>
-
-    {allocation !== '0' && (
+    
+    {parseInt(allocation, 10) > 0 && (
       <div className="text-muted text-left border rounded p-2 mb-2 learn-more">
         <img src={info} alt="" />
         <p className="m-0 p-0">
-          Your budget wasn’t fullly rewarded to others. Note that you can only withdraw your own reward if you’ve spend
+          Your budget wasn’t fully rewarded to others. Note that you can only withdraw your own reward if you’ve spend
           your full budget to reward others.
         </p>
       </div>
