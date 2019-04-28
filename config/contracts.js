@@ -197,7 +197,7 @@ module.exports = {
         "address": "0x744d70fdbe2ba4cf95131626614a1763df805b9e"
       },
       "Meritocracy": {
-        "address": "0x3d8ec98c08b55ec42310aace562e077d784591d6"
+        "address": "0x0c869a3f3e915b49727669b5ea28c2efdf9a0a66"
       }
     },
     deployment: {
