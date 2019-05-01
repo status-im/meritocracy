@@ -7,7 +7,4 @@ import '../css/fonts/Inter/inter.css';
 import '../css/bootstrap-overrides.scss';
 import '../css/index.scss';
 
-ReactDOM.render(
-    <App/>,
-  document.getElementById('app')
-);
+ReactDOM.render(<App />, document.querySelector('#app'));

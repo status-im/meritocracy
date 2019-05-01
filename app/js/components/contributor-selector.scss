@@ -1,0 +1,31 @@
+
+@import "../../css/variable-overrides";
+
+.contributorSelector > div:first-child,
+.contributorSelector input {
+  border-color: #EEF2F5 !important;
+}
+
+.contributorSelector > div:nth-child(3){
+  background: #FFFFFF !important;
+  z-index: 99999;
+}
+
+.label {
+  font-size: 15px;
+}
+
+.plus-5 {
+  width: 45px;
+  margin: auto;
+  position: relative;
+  cursor: pointer;
+  span {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    font-size: 12px;
+    color: $dark;
+
+  }
+}

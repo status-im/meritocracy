@@ -1,11 +1,11 @@
 /*global web3*/
-import React, {Fragment} from 'react';
-import {HashRouter, Route, Redirect, Switch} from "react-router-dom";
+import React from 'react';
+import { HashRouter, Route, Redirect, Switch } from 'react-router-dom';
 import ThemeProvider from 'react-bootstrap/ThemeProvider';
 
 import EmbarkJS from 'Embark/EmbarkJS';
 
-import {isAdmin} from './services/Meritocracy';
+import { isAdmin } from './services/Meritocracy';
 import Header from './components/Header';
 import Home from './components/Home';
 import Admin from './components/Admin';
@@ -14,7 +14,6 @@ const MAINNET = 1;
 const TESTNET = 3;
 
 class App extends React.Component {
-
   state = {
     error: null,
     loading: true,
@@ -22,52 +21,57 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    EmbarkJS.onReady(async (err) => {
+    EmbarkJS.onReady(async err => {
       if (err) {
-        return this.setState({error: err.message || err});
+        return this.setState({ error: err.message || err });
       }
 
       const netId = await web3.eth.net.getId();
       if (EmbarkJS.environment === 'testnet' && netId !== TESTNET) {
-        return this.setState({error: 'Please connect to Ropsten'});
+        return this.setState({ error: 'Please connect to Ropsten' });
       }
       if (EmbarkJS.environment === 'livenet' && netId !== MAINNET) {
-        return this.setState({error: 'Please connect to Mainnet'});
+        return this.setState({ error: 'Please connect to Mainnet' });
       }
 
       const isUserAdmin = await isAdmin(web3.eth.defaultAccount);
 
-      this.setState({loading: false, isUserAdmin})
+      this.setState({ loading: false, isUserAdmin });
     });
   }
 
   render() {
-    const {error, loading, isUserAdmin} = this.state;
+    const { error, loading, isUserAdmin } = this.state;
 
     if (error) {
-      return (<div>
-        <div>Something went wrong connecting to Ethereum. Please make sure you have a node running or are using Metamask
-          to connect to the Ethereum network:
+      return (
+        <div>
+          <div>
+            Something went wrong connecting to Ethereum. Please make sure you have a node running or are using Metamask
+            to connect to the Ethereum network:
+          </div>
+          <div>{error}</div>
         </div>
-        <div>{error}</div>
-      </div>);
+      );
     }
 
     if (loading) {
       return <p>Loading, please wait</p>;
     }
 
-    return (<HashRouter>
-      <ThemeProvider prefixes={{ btn: 'my-btn' }}>
-        <Header isUserAdmin={isUserAdmin}/>
-        <Switch>
-          <Route exact path="/" component={Home}/>
-          {isUserAdmin && <Route exact path="/admin" component={Admin}/>}
+    return (
+      <HashRouter>
+        <ThemeProvider prefixes={{ btn: 'my-btn' }}>
+          <Header isUserAdmin={isUserAdmin} />
+          <Switch>
+            <Route exact path="/" component={Home} />
+            {isUserAdmin && <Route exact path="/admin" component={Admin} />}
 
-          <Redirect to="/404"/>
-        </Switch>
-      </ThemeProvider>
-    </HashRouter>);
+            <Redirect to="/404" />
+          </Switch>
+        </ThemeProvider>
+      </HashRouter>
+    );
   }
 }
 

@@ -8,7 +8,7 @@ function getContributors () {
    return addresses;
 }
 
-const OG_IPFS_HASH = '0x516d617555364a6b66767038756a44444259784b3553797a58325831635842616642344259584e6838514d4b6e31';
+const OG_IPFS_HASH = '0x516d5968703543324c75646d45333239436d41594671625767733869577036625177396355714576544742356163';
 
 module.exports = {
   // default applies to all environments
@@ -197,7 +197,7 @@ module.exports = {
         "address": "0x744d70fdbe2ba4cf95131626614a1763df805b9e"
       },
       "Meritocracy": {
-        "address": "0x3d8ec98c08b55ec42310aace562e077d784591d6"
+        "address": "0x0c869a3f3e915b49727669b5ea28c2efdf9a0a66"
       }
     },
     deployment: {

@@ -1,14 +1,15 @@
 /*global web3*/
-import React, {Fragment} from 'react';
-import {Row, Col, Alert, Button, Container, Form, Tabs, Tab} from 'react-bootstrap';
-import NumericInput from 'react-numeric-input';
-import Select from 'react-select';
-
+import React, { Fragment } from 'react';
+import { Tabs, Tab } from 'react-bootstrap';
 import Meritocracy from 'Embark/contracts/Meritocracy';
-
-import {getFormattedContributorList, getCurrentContributorData} from '../services/Meritocracy';
-
+import { getFormattedContributorList, getCurrentContributorData } from '../services/Meritocracy';
 import './home.scss';
+import Step1 from './Step1';
+import Step2 from './Step2';
+import Loading from './Loading';
+import Complete from './Complete';
+import Error from './Error';
+import Withdrawal from './Withdrawal';
 
 /*
 TODO:
@@ -17,10 +18,8 @@ TODO:
 */
 
 class Home extends React.Component {
-
   state = {
     errorMsg: null,
-    busy: true,
     selectedContributors: [],
     contributorList: [],
     currentContributor: {
@@ -31,7 +30,10 @@ class Home extends React.Component {
       status: []
     },
     award: 0,
-    praise: ''
+    praise: '',
+    step: 'HOME',
+    checkbox: false,
+    tab: 'reward'
   };
 
   constructor(props) {
@@ -50,54 +52,76 @@ class Home extends React.Component {
 
       const currentContributor = await getCurrentContributorData();
 
-      this.setState({busy: false, currentContributor, contributorList});
-    } catch (e) {
-      this.setState({errorMsg: e.message || e});
+      this.setState({ busy: false, currentContributor, contributorList });
+    } catch (error) {
+      this.setState({ errorMsg: error.message || error });
     }
   }
 
   handleContributorSelection(_selectedContributors) {
-    this.setState({ selectedContributors: _selectedContributors });
+    this.setState({ selectedContributors: _selectedContributors }, () => {
+      this._setAward(this.state.award);
+    });
   }
 
-  handleAwardChange(_amount) {
-    const { currentContributor: {allocation}, selectedContributors} = this.state;
-
-    const maxAllocation = allocation / selectedContributors.length;
-    const award = (_amount <=  maxAllocation ? _amount : maxAllocation );
-    this.setState({award});
+  handleAwardChange(e) {
+    if (e.target.value.trim() === '') {
+      this.setState({ award: '' });
+      return;
+    }
+    this._setAward(e.target.value);
   }
+
+  handlePlus5 = () => {
+    this._setAward(this.state.award + 5);
+  };
+
+  _setAward = value => {
+    let _amount = parseInt(value, 10);
+    if (_amount < 0 || isNaN(_amount)) _amount = 0;
+
+    const {
+      currentContributor: { allocation },
+      selectedContributors
+    } = this.state;
+    const maxAllocation = selectedContributors.length > 0 ? Math.floor(allocation / selectedContributors.length) : 0;
+    const award = _amount <= maxAllocation ? _amount : maxAllocation;
+
+    this.setState({ award });
+  };
 
   handlePraiseChange(e) {
     this.setState({ praise: e.target.value });
   }
 
-  resetUIFields(){
+  handleCheckbox = () => {
+    this.setState(prevState => ({ checkbox: !prevState.checkbox }));
+  };
+
+  resetUIFields() {
     this.setState({
       praise: '',
       selectedContributors: [],
       errorMsg: '',
-      award: 0
+      award: 0,
+      checkbox: false
     });
   }
 
-  async awardTokens(e) {
-    const {award, selectedContributors, praise} = this.state;
+  async awardTokens() {
+    const { award, selectedContributors, praise } = this.state;
 
-    // TODO some sanity checks
-    if(award <= 0) {
-      this.setState({errorMsg: 'amount must be more than 0'});
-      return;
-    }
+    this.moveStep('BUSY')();
 
     let addresses = selectedContributors.map(a => a.value);
 
-    const sntAmount = web3.utils.toWei(award.toString(), "ether");
+    const sntAmount = web3.utils.toWei(award.toString(), 'ether');
 
     let toSend;
-    switch(addresses.length) {
+
+    switch (addresses.length) {
       case 0:
-        this.setState({errorMsg: 'No Contributor Selected'});
+        this.setState({ errorMsg: 'No Contributor Selected' });
         return;
       case 1:
         toSend = Meritocracy.methods.award(addresses[0], sntAmount, praise);
@@ -108,126 +132,123 @@ class Home extends React.Component {
     }
 
     try {
-      this.setState({busy: true});
-
-      const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
-      const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
+      const estimatedGas = await toSend.estimateGas({ from: web3.eth.defaultAccount });
+      await toSend.send({ from: web3.eth.defaultAccount, gas: estimatedGas + 1000 });
       this.resetUIFields();
       const currentContributor = await getCurrentContributorData();
-      this.setState({currentContributor});
-    } catch(e) {
-      this.setState({errorMsg: 'tx failed? got enough tokens to award?'});
-      console.error(e);
-    } finally {
-      this.setState({busy: false});
+      this.setState({ currentContributor });
+      this.moveStep('COMPLETE')();
+    } catch (error) {
+      this.setState({ errorMsg: 'tx failed? got enough tokens to award?' });
+      console.error(error);
     }
   }
 
-
-  async withdrawTokens(e) {
-    const {currentContributor} = this.state;
+  async withdrawTokens() {
+    const { currentContributor } = this.state;
 
     if (currentContributor.received === 0) {
-      this.setState({errorMsg: 'can only call withdraw when you have tokens'});
+      this.setState({ errorMsg: 'can only call withdraw when you have tokens' });
       return;
     }
 
-    if ( currentContributor.allocation > 0 ) {
-      this.setState({errorMsg: 'you must allocate all your tokens'});
+    if (currentContributor.allocation > 0) {
+      this.setState({ errorMsg: 'you must allocate all your tokens' });
       return;
     }
+
+    this.moveStep('BUSY')();
 
     const toSend = Meritocracy.methods.withdraw();
 
     try {
-      this.setState({busy: true});
+      this.setState({ busy: true });
 
-      const estimatedGas = await toSend.estimateGas({from: web3.eth.defaultAccount});
-      const receipt = await toSend.send({from: web3.eth.defaultAccount, gas: estimatedGas + 1000});
+      const estimatedGas = await toSend.estimateGas({ from: web3.eth.defaultAccount });
+      await toSend.send({ from: web3.eth.defaultAccount, gas: estimatedGas + 1000 });
 
       const currentContributor = await getCurrentContributorData();
-      this.setState({currentContributor});
-    } catch(e) {
-      this.setState({errorMsg: 'tx failed? Did you allocate all your tokens first?'});
-      console.error(e);
-    } finally {
-      this.setState({busy: false});
+      this.setState({ currentContributor });
+
+      this.moveStep('COMPLETE')();
+    } catch (error) {
+      console.error(error);
+      this.setState({ errorMsg: 'tx failed? Did you allocate all your tokens first?' });
     }
   }
 
+  moveStep = nexStep => () => {
+    this.setState({ step: nexStep, errorMsg: '' });
+  };
+
   render() {
-    const { selectedContributors, contributorList, award, currentContributor, praise, busy, errorMsg } = this.state;
+    const {
+      selectedContributors,
+      contributorList,
+      award,
+      currentContributor,
+      praise,
+      errorMsg,
+      step,
+      checkbox,
+      tab
+    } = this.state;
 
-    const maxAllocation = selectedContributors.length ? currentContributor.allocation / selectedContributors.length : 0;
+    if (errorMsg) return <Error title="Error" message={errorMsg} onClick={this.moveStep('HOME')} />;
 
-    const orderedContributors = contributorList.sort((a,b) => {
-      if (a.label < b.label) return -1;
-      if (a.label > b.label) return 1;
-      return 0;
-    });
+    return (
+      <Fragment>
+        <Tabs className="home-tabs mb-3" activeKey={tab} onSelect={tab => this.setState({ tab })}>
+          <Tab eventKey="reward" title="Reward" className="reward-panel">
+            {step === 'HOME' && (
+              <Step1
+                allocation={currentContributor.allocation}
+                onChangeAward={this.handleAwardChange}
+                onSelectContributor={this.handleContributorSelection}
+                onClickPlus5={this.handlePlus5}
+                contributorList={contributorList}
+                selectedContributors={selectedContributors}
+                award={award}
+                isChecked={checkbox}
+                onClickCheckbox={this.handleCheckbox}
+                onClickNext={this.moveStep('PRAISE')}
+              />
+            )}
 
-    return (<Fragment>
-      {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-      {busy && <p>Working...</p>}
+            {step === 'PRAISE' && (
+              <Step2
+                selectedContributors={selectedContributors}
+                award={award}
+                praise={praise}
+                onChangeNote={this.handlePraiseChange}
+                onClickBack={this.moveStep('HOME')}
+                onClickAward={this.awardTokens}
+              />
+            )}
 
-      <Tabs defaultActiveKey="reward" className="home-tabs mb-3">
-        <Tab eventKey="reward" title="Reward" className="reward-panel">
-          <div className="text-center p-4">
-            <p className="text-muted">Reward Status contributors for all the times they impressed you.</p>
-            <p className="allocation mb-0">{currentContributor.allocation} <span className="text-muted">SNT</span></p>
-            <p className="text-muted">Available</p>
-          </div>
+            {step === 'BUSY' && <Loading />}
 
-          <Select
-            isMulti
-            value={selectedContributors}
-            onChange={this.handleContributorSelection}
-            options={orderedContributors}
-            placeholder="Choose Contributor(s)..."
-            isDisabled={busy}
-            className="mb-2"
-          />
+            {step === 'COMPLETE' && <Complete onClick={this.moveStep('HOME')} />}
+          </Tab>
 
-          {selectedContributors.length === 0 && <Alert variant="secondary">
-            Please select one or more contributors
-          </Alert>}
+          <Tab eventKey="withdraw" title="Withdraw" className="withdraw-panel">
+            {step === 'HOME' && (
+              <Withdrawal
+                onClick={this.withdrawTokens}
+                totalReceived={currentContributor.totalReceived}
+                allocation={currentContributor.allocation}
+                contributorList={contributorList}
+                praises={currentContributor.praises}
+              />
+            )}
 
-          <NumericInput mobile step={5} min={0} max={maxAllocation} onChange={this.handleAwardChange} value={award}
-                        disabled={busy} className="form-control mb-2"/>
+            {step === 'BUSY' && <Loading />}
 
-          <Form>
-            <Form.Control disabled={busy} placeholder="Enter your praise..." onChange={this.handlePraiseChange}
-                          value={praise}/>
-          </Form>
-          <p className="text-center"> Total Awarding: {award * selectedContributors.length} SNT </p>
-          <p className="text-center"><Button disabled={busy} variant="outline-primary" onClick={this.awardTokens}>Award</Button></p>
-        </Tab>
-
-        <Tab eventKey="withdraw" title="Withdraw">
-          <p>Your Total Received Kudos: {currentContributor.totalReceived || 0} SNT</p>
-          <p>Your Total Forfeited Kudos: {currentContributor.totalForfeited || 0} SNT</p>
-
-          <h4>Your Kudos History</h4>
-          <p>Your Received Kudos: <b>{currentContributor.received} SNT</b></p>
-
-          <p className="text-center">
-            <Button variant="outline-primary" onClick={this.withdrawTokens} disabled={busy}>
-              Withdraw
-            </Button>
-          </p>
-
-          <Container>
-            <Row>
-              {currentContributor.praises && currentContributor.praises.map((item, i) => {
-                const name = options.find(x => x.value === item.author);
-                return <Col key={i}>{(name && name.label) || item.author} has sent
-                  you {web3.utils.fromWei(item.amount, "ether")} SNT {item.praise && "\"" + item.praise + "\""}</Col>;
-              })}
-            </Row>
-          </Container>
-        </Tab>
-      </Tabs>
-    </Fragment>);
+            {step === 'COMPLETE' && <Complete onClick={this.moveStep('HOME')} />}
+          </Tab>
+        </Tabs>
+      </Fragment>
+    );
   }
 }
 
