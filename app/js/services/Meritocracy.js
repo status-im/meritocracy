@@ -140,6 +140,43 @@ export async function getContributorData(_address) {
   return currentContributor;
 }
 
+export function getAllPraises() {
+
+  return new Promise(function(resolve) {
+    let praisesPromises = [];
+    let praiseNumPromises = [];
+    for(let i = 0; i < contributorList.length; i++){
+      praiseNumPromises.push(Meritocracy.methods.getStatusLength(contributorList[i].value).call());
+    }
+
+    Promise.all(praiseNumPromises).then(praiseNums => {
+      for(let i = 0; i < contributorList.length; i++){
+        let currPraises = [];
+        for(let j = 0; j < praiseNums[i]; j++){
+          currPraises.push(Meritocracy.methods.getStatus(contributorList[i].value, j).call());
+        }
+        praisesPromises.push(currPraises);
+      }
+
+      const allPromises = Promise.all(
+        praisesPromises.map(function(innerPromiseArray) {
+          return Promise.all(innerPromiseArray);
+        })
+      );
+
+      allPromises.then(praises => {
+        for(let i = 0; i < praises.length; i++){
+          praises[i] = praises[i].map(x => {
+            x.destination = contributorList[i].label;
+            return x;
+          }); 
+        }
+        resolve(praises.flat());
+      });
+    });
+  });
+
+}
 
 export async function getContributor(_address) {
   const contributor = await Meritocracy.methods.contributors(_address).call();

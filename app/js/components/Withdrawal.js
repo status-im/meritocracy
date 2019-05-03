@@ -1,9 +1,7 @@
-/* global web3 */
 import React, { Fragment } from 'react';
-import { Row, Col, Button, Container } from 'react-bootstrap';
-import moment from 'moment';
+import { Button, Container } from 'react-bootstrap';
 import info from '../../images/red-info.svg';
-import Address from './Address';
+import Praise from './Praise';
 
 import './withdrawal.scss';
 
@@ -19,32 +17,7 @@ const Withdrawal = ({ totalReceived, allocation, onClick, contributorList, prais
 
     <Container>
       {praises &&
-        praises.map((item, i) => {
-          const name = contributorList.find(x => x.value === item.author);
-          const date = moment.unix(item.time).fromNow();
-          return (
-            <Row key={i}>
-              <Col className="mb-4 text-muted">
-                {!item.praise && (
-                  <Fragment>
-                    {(name && name.label) || <Address value={item.author} compact={true} />} has sent you{' '}
-                    {web3.utils.fromWei(item.amount, 'ether')} SNT <small>{date}</small>
-                  </Fragment>
-                )}
-
-                {item.praise && (
-                  <Fragment>
-                    {(name && name.label) || item.author}, <small>{date}</small>
-                    <div className="chatBubble p-3">
-                      &quot;{item.praise}&quot;
-                      <small className="float-right">{web3.utils.fromWei(item.amount, 'ether')} SNT</small>
-                    </div>
-                  </Fragment>
-                )}
-              </Col>
-            </Row>
-          );
-        })}
+        praises.map((item, i) => <Praise key={i} individual={true} contributorList={contributorList} item={item} />)}
     </Container>
 
     <p className="text-center">
@@ -57,7 +30,7 @@ const Withdrawal = ({ totalReceived, allocation, onClick, contributorList, prais
       </Button>
     </p>
     
-    {parseInt(allocation, 10) > 0 && (
+    {totalReceived !== '0' && parseInt(allocation, 10) > 0 && (
       <div className="text-muted text-left border rounded p-2 mb-2 learn-more">
         <img src={info} alt="" />
         <p className="m-0 p-0">
