@@ -110,30 +110,36 @@ const prepareOptions = option => {
   return option;
 };
 
-export async function getCurrentContributorData() {
+export async function getCurrentContributorData(){
   const mainAccount = web3.eth.defaultAccount;
-  const currentContributor = await getContributor(mainAccount);
+  const contribData = await getContributorData(mainAccount);
+  return contribData;
+}
+
+export async function getContributorData(_address) {
+  const currentContributor = await getContributor(_address);
 
   let praises = [];
-  for (let i = 0; i < currentContributor.praiseNum; i++) {
-    praises.push(Meritocracy.methods.getStatus(mainAccount, i).call());
+  for(let i = 0; i < currentContributor.praiseNum; i++){
+    praises.push(Meritocracy.methods.getStatus(_address, i).call());
   }
 
   if (!contributorList) {
     await getContributorList();
   }
 
-  const contribData = contributorList.find(x => x.value === mainAccount);
-  if (contribData) currentContributor.name = contribData.label;
+  const contribData = contributorList.find(x => x.value === _address);
+  if(contribData) currentContributor.name = contribData.label;
 
   currentContributor.praises = await Promise.all(praises);
-  currentContributor.allocation = web3.utils.fromWei(currentContributor.allocation, 'ether');
-  currentContributor.totalForfeited = web3.utils.fromWei(currentContributor.totalForfeited, 'ether');
-  currentContributor.totalReceived = web3.utils.fromWei(currentContributor.totalReceived, 'ether');
-  currentContributor.received = web3.utils.fromWei(currentContributor.received, 'ether');
+  currentContributor.allocation = web3.utils.fromWei(currentContributor.allocation, "ether");
+  currentContributor.totalForfeited = web3.utils.fromWei(currentContributor.totalForfeited, "ether");
+  currentContributor.totalReceived = web3.utils.fromWei(currentContributor.totalReceived, "ether");
+  currentContributor.received = web3.utils.fromWei(currentContributor.received, "ether");
 
   return currentContributor;
 }
+
 
 export async function getContributor(_address) {
   const contributor = await Meritocracy.methods.contributors(_address).call();
