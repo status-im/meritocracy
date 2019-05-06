@@ -17,7 +17,6 @@ const Header = ({ isUserAdmin }) => (
           <Nav className="mr-auto">
             <Nav.Link href="#/">Home</Nav.Link>
             <Nav.Link href="#/admin">Admin</Nav.Link>
-            <Nav.Link href="#/wall">The Wall</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </React.Fragment>

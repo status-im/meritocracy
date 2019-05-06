@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Button, Form, Alert, ListGroup, OverlayTrigger, Tooltip, Modal, Tabs, Tab, Table } from 'react-bootstrap';
 import ValidatedForm from 'react-validation/build/form';
 import Input from 'react-validation/build/input';
-import { required, isAddress } from '../validators';
+import { required, isAddress, isNumber, higherThan } from '../validators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { addContributor, getFormattedContributorList, removeContributor, getContributorData } from '../services/Meritocracy';
@@ -27,7 +27,8 @@ class Admin extends React.Component {
     showDeleteModal: false,
     focusedContributorIndex: -1,
     sortBy: 'label',
-    tab: 'admin'
+    tab: 'admin',
+    sntPerContributor: 0,
   };
 
   async componentDidMount() {
@@ -107,7 +108,8 @@ class Admin extends React.Component {
       successMsg,
       focusedContributorIndex,
       sortBy,
-      tab
+      tab,
+      sntPerContributor
     } = this.state;
     const currentContributor = focusedContributorIndex > -1 ? contributorList[focusedContributorIndex] : {};
     const sortedContributorList = contributorList.sort(sort(sortBy));
@@ -115,8 +117,8 @@ class Admin extends React.Component {
     return (
       <Fragment>
         <Tabs className="home-tabs mb-3" activeKey={tab} onSelect={tab => this.setState({ tab })}>
-          <Tab eventKey="admin" title="Admin Panel" className="admin-panel">
-            <h2>Admin Panel</h2>
+          <Tab eventKey="admin" title="Contributors" className="admin-panel">
+            <h2>Contributors</h2>
             {error && <Alert variant="danger">{error}</Alert>}
             {successMsg && <Alert variant="success">{successMsg}</Alert>}
             {busy && <Alert variant="primary">Working...</Alert>}
@@ -149,11 +151,12 @@ class Admin extends React.Component {
                 Add
               </Button>
             </ValidatedForm>
+            <hr className="mt-5 mb-5" />
             <h3>Contributor List</h3>
             <ListGroup>
               {contributorList.sort(sortByAlpha('label')).map((contributor, idx) => (
                 <ListGroup.Item key={contributor.value} action className="contributor-item">
-                  <span className="font-weight-bold">{contributor.label}:</span> {contributor.value}
+                  <span className="font-weight-bold">{contributor.label}:</span> <span className="text-small">{contributor.value}</span>
                   <div className="contributor-controls float-right">
                     <OverlayTrigger placement="top" overlay={<Tooltip>Delete contributor</Tooltip>}>
                       <FontAwesomeIcon
@@ -167,7 +170,42 @@ class Admin extends React.Component {
               ))}
             </ListGroup>
           </Tab>
+          <Tab eventKey="allocation" title="Allocation" className="allocation-panel">
+            <h2>Allocation</h2>
+            <ValidatedForm onSubmit={e => {alert("TODO")}}>
+              <Form.Group controlId="fundAllocation">
+                <Form.Label>SNT per contributor</Form.Label>
+                <Form.Text className="text-muted">
+                  Total: {(contributorList.length * parseInt(sntPerContributor, 10)) || 0} SNT
+                </Form.Text>
+                <Input
+                  type="text"
+                  placeholder="0"
+                  value={sntPerContributor}
+                  onChange={e => this.onChange('sntPerContributor', e)}
+                  className="form-control"
+                  validations={[required, isNumber, higherThan.bind(null, 0)]}
+                />
+              </Form.Group>
+              <Button variant="primary" onClick={e => {alert("TODO")}}>
+                Allocate Funds
+              </Button>
+            </ValidatedForm>
+            <hr className="mt-5 mb-5" />
+            <ValidatedForm onSubmit={e => {alert("TODO")}}>
+              <Form.Group>
+                <Button variant="primary" onClick={e => {alert("TODO")}}>
+                  Forfeit Allocation
+                </Button>
+                <Form.Text className="text-muted">
+                  Forfeited N days ago
+                </Form.Text>
+              </Form.Group>
+              
+            </ValidatedForm>
+          </Tab>
           <Tab eventKey="leaderboard" title="Leaderboard" className="leaderboard-panel">
+            <h2>Leaderboard</h2>
             <Table striped bordered hover responsive size="sm">
               <thead>
                 <tr>
