@@ -1,14 +1,20 @@
 import React, { Fragment } from 'react';
-import { Button, Form, Alert, ListGroup, OverlayTrigger, Tooltip, Modal } from 'react-bootstrap';
+import { Button, Form, Alert, ListGroup, OverlayTrigger, Tooltip, Modal, Tabs, Tab, Table } from 'react-bootstrap';
 import ValidatedForm from 'react-validation/build/form';
 import Input from 'react-validation/build/input';
 import { required, isAddress } from '../validators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-
-import { addContributor, getFormattedContributorList, removeContributor } from '../services/Meritocracy';
+import { addContributor, getFormattedContributorList, removeContributor, getContributorData } from '../services/Meritocracy';
+import { sortByAlpha, sortByAttribute, sortNullableArray } from '../utils';
 
 import './admin.scss';
+
+const sort = (orderBy) => {
+  if(orderBy === 'praises') return sortNullableArray('praises');
+  if(orderBy === 'label') return sortByAlpha('label');
+  return sortByAttribute(orderBy);
+};
 
 class Admin extends React.Component {
   state = {
@@ -19,7 +25,9 @@ class Admin extends React.Component {
     successMsg: '',
     contributorList: [],
     showDeleteModal: false,
-    focusedContributorIndex: -1
+    focusedContributorIndex: -1,
+    sortBy: 'label',
+    tab: 'admin'
   };
 
   async componentDidMount() {
@@ -27,6 +35,16 @@ class Admin extends React.Component {
       const contributorList = await getFormattedContributorList();
 
       this.setState({ busy: false, contributorList });
+
+      // TODO: this can be replaced by event sourcing
+      contributorList.forEach(contrib => {
+        getContributorData(contrib.value)
+          .then(data => {
+            contrib = Object.assign(contrib, data);
+            this.setState({contributorList});
+          });
+      });
+
     } catch (error) {
       this.setState({ errorMsg: error.message || error });
     }
@@ -75,6 +93,10 @@ class Admin extends React.Component {
     this.setState({ showDeleteModal: false });
   };
 
+  sortBy = (order) => () => {
+    this.setState({sortBy: order});
+  }
+
   render() {
     const {
       contributorAddress,
@@ -83,63 +105,95 @@ class Admin extends React.Component {
       busy,
       contributorList,
       successMsg,
-      focusedContributorIndex
+      focusedContributorIndex,
+      sortBy,
+      tab
     } = this.state;
     const currentContributor = focusedContributorIndex > -1 ? contributorList[focusedContributorIndex] : {};
+    const sortedContributorList = contributorList.sort(sort(sortBy));
 
     return (
       <Fragment>
-        <h2>Admin Panel</h2>
-        {error && <Alert variant="danger">{error}</Alert>}
-        {successMsg && <Alert variant="success">{successMsg}</Alert>}
-        {busy && <Alert variant="primary">Working...</Alert>}
-        <h3>Add a contributor</h3>
-        <ValidatedForm onSubmit={e => this.addContributor(e)}>
-          <Form.Group controlId="formContributor">
-            <Form.Label>Contributor name</Form.Label>
-            <Input
-              type="text"
-              placeholder="Name"
-              value={contributorName}
-              onChange={e => this.onChange('contributorName', e)}
-              className="form-control"
-              validations={[required]}
-            />
-          </Form.Group>
+        <Tabs className="home-tabs mb-3" activeKey={tab} onSelect={tab => this.setState({ tab })}>
+          <Tab eventKey="admin" title="Admin Panel" className="admin-panel">
+            <h2>Admin Panel</h2>
+            {error && <Alert variant="danger">{error}</Alert>}
+            {successMsg && <Alert variant="success">{successMsg}</Alert>}
+            {busy && <Alert variant="primary">Working...</Alert>}
+            <h3>Add a contributor</h3>
+            <ValidatedForm onSubmit={e => this.addContributor(e)}>
+              <Form.Group controlId="formContributor">
+                <Form.Label>Contributor name</Form.Label>
+                <Input
+                  type="text"
+                  placeholder="Name"
+                  value={contributorName}
+                  onChange={e => this.onChange('contributorName', e)}
+                  className="form-control"
+                  validations={[required]}
+                />
+              </Form.Group>
 
-          <Form.Group controlId="formAddress">
-            <Form.Label>Contributor address</Form.Label>
-            <Input
-              type="text"
-              placeholder="0x"
-              value={contributorAddress}
-              onChange={e => this.onChange('contributorAddress', e)}
-              className="form-control"
-              validations={[required, isAddress]}
-            />
-          </Form.Group>
-          <Button variant="primary" onClick={e => this.addContributor(e)}>
-            Add
-          </Button>
-        </ValidatedForm>
-        <h3>Contributor List</h3>
-        <ListGroup>
-          {contributorList.map((contributor, idx) => (
-            <ListGroup.Item key={contributor.value} action className="contributor-item">
-              <span className="font-weight-bold">{contributor.label}:</span> {contributor.value}
-              <div className="contributor-controls float-right">
-                <OverlayTrigger placement="top" overlay={<Tooltip>Delete contributor</Tooltip>}>
-                  <FontAwesomeIcon
-                    icon={faTrash}
-                    className="text-danger icon"
-                    onClick={e => this.removeContributor(e, idx)}
-                  />
-                </OverlayTrigger>
-              </div>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
-
+              <Form.Group controlId="formAddress">
+                <Form.Label>Contributor address</Form.Label>
+                <Input
+                  type="text"
+                  placeholder="0x"
+                  value={contributorAddress}
+                  onChange={e => this.onChange('contributorAddress', e)}
+                  className="form-control"
+                  validations={[required, isAddress]}
+                />
+              </Form.Group>
+              <Button variant="primary" onClick={e => this.addContributor(e)}>
+                Add
+              </Button>
+            </ValidatedForm>
+            <h3>Contributor List</h3>
+            <ListGroup>
+              {contributorList.sort(sortByAlpha('label')).map((contributor, idx) => (
+                <ListGroup.Item key={contributor.value} action className="contributor-item">
+                  <span className="font-weight-bold">{contributor.label}:</span> {contributor.value}
+                  <div className="contributor-controls float-right">
+                    <OverlayTrigger placement="top" overlay={<Tooltip>Delete contributor</Tooltip>}>
+                      <FontAwesomeIcon
+                        icon={faTrash}
+                        className="text-danger icon"
+                        onClick={e => this.removeContributor(e, idx)}
+                      />
+                    </OverlayTrigger>
+                  </div>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          </Tab>
+          <Tab eventKey="leaderboard" title="Leaderboard" className="leaderboard-panel">
+            <Table striped bordered hover responsive size="sm">
+              <thead>
+                <tr>
+                  <th onClick={this.sortBy('label')}>Contributor</th>
+                  <th onClick={this.sortBy('allocation')}>Allocation</th>
+                  <th onClick={this.sortBy('totalReceived')}>SNT Received</th>
+                  <th onClick={this.sortBy('totalForfeited')}>SNT Forfeited</th>
+                  <th onClick={this.sortBy('praises')}>Praises Received</th>
+                </tr>
+              </thead>
+              <tbody>
+                { 
+                  sortedContributorList.map((contrib, i) => (
+                    <tr key={i}>
+                      <td>{contrib.label}</td>
+                      <td>{contrib.allocation}</td>
+                      <td>{contrib.totalReceived}</td>
+                      <td>{contrib.totalForfeited}</td>
+                      <td>{contrib.praises ? contrib.praises.length : 0}</td>
+                    </tr>
+                  ))
+                } 
+              </tbody>
+            </Table>
+          </Tab>
+        </Tabs>
         <Modal show={this.state.showDeleteModal} onHide={this.handleClose}>
           <Modal.Header closeButton>
             <Modal.Title>Are you sure you want to remove this contributor?</Modal.Title>

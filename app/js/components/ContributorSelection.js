@@ -6,12 +6,6 @@ import statusLogo from '../../images/status-logo.svg';
 
 import './contributor-selector.scss';
 
-const sortByAlpha = (a, b) => {
-  if (a.label < b.label) return -1;
-  if (a.label > b.label) return 1;
-  return 0;
-};
-
 const ContributorSelection = ({
   allocation,
   contributorList,
@@ -40,7 +34,7 @@ const ContributorSelection = ({
             isMulti
             value={selectedContributors}
             onChange={onSelectContributor}
-            options={contributorList.sort(sortByAlpha)}
+            options={contributorList}
             placeholder="Choose Contributor(s)..."
             className="mb-2 contributorSelector"
             theme={theme => ({

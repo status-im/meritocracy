@@ -10,7 +10,7 @@ import Loading from './Loading';
 import Complete from './Complete';
 import Error from './Error';
 import Withdrawal from './Withdrawal';
-
+import {sortByAlpha} from '../utils';
 /*
 TODO:
 - list praise for contributor
@@ -48,11 +48,11 @@ class Home extends React.Component {
 
   async componentDidMount() {
     try {
-      const contributorList = await getFormattedContributorList();
+      const contributorList = (await getFormattedContributorList());
 
       const currentContributor = await getCurrentContributorData();
 
-      this.setState({ busy: false, currentContributor, contributorList });
+      this.setState({ busy: false, currentContributor, contributorList: contributorList.sort(sortByAlpha('label'))});
     } catch (error) {
       this.setState({ errorMsg: error.message || error });
     }
