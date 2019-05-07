@@ -12,6 +12,12 @@ export const sortByAttribute = field => (a, b) => {
   return 0;
 };
 
+export const sortByAttributeDesc = field => (a, b) => {
+  if (a[field] < b[field]) return -1;
+  if (a[field] > b[field]) return 1;
+  return 0;
+};
+
 export const sortNullableArray = field => (a, b) => {
   const a_field = a[field] || [];
   const b_field = b[field] || [];

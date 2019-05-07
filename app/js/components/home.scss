@@ -7,8 +7,8 @@
     border: none;
     color: $dark;
     border-bottom: 2px solid $dark;
-    font-size: 17px;
-    width: 48%;
+    font-size: 15px;
+    width: 32%;
     text-align: center;
 
     &.active {
@@ -17,7 +17,7 @@
     }
 
     &+.nav-link {
-      margin-left: 4%;
+      margin-left: 2%;
     }
   }
 }
