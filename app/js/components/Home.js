@@ -11,7 +11,6 @@ import Complete from './Complete';
 import Error from './Error';
 import Withdrawal from './Withdrawal';
 import {sortByAlpha, sortByAttribute} from '../utils';
-import Praise from './Praise';
 /*
 TODO:
 - list praise for contributor
@@ -55,7 +54,7 @@ class Home extends React.Component {
       const currentContributor = await getCurrentContributorData();
 
       this.setState({ busy: false, currentContributor, contributorList: contributorList.sort(sortByAlpha('label'))});
-
+      
       getAllPraises().then(praises => {
         this.setState({praises: praises.sort(sortByAttribute('time'))});
       });
