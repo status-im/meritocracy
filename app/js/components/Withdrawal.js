@@ -5,12 +5,12 @@ import Praise from './Praise';
 
 import './withdrawal.scss';
 
-const Withdrawal = ({ totalReceived, allocation, onClick, contributorList, praises }) => (
+const Withdrawal = ({ received, allocation, onClick, contributorList, praises }) => (
   <Fragment>
     <div className="text-center p-4">
       <p className="text-muted mb-0 mt-5">You have been awarded</p>
       <p className="awarded mb-0">
-        {totalReceived || 0} <span className="text-muted">SNT</span>
+        {received || 0} <span className="text-muted">SNT</span>
       </p>
       <p className="text-muted">Available for withdraw</p>
     </div>
@@ -22,15 +22,15 @@ const Withdrawal = ({ totalReceived, allocation, onClick, contributorList, prais
 
     <p className="text-center">
       <Button
-        variant={allocation !== '0' || totalReceived === '0' ? 'secondary' : 'primary'}
+        variant={allocation !== '0' || received === '0' ? 'secondary' : 'primary'}
         onClick={onClick}
-        disabled={allocation !== '0' || totalReceived === '0'}
+        disabled={allocation !== '0' || received === '0'}
       >
         Withdraw
       </Button>
     </p>
-    
-    {totalReceived !== '0' && parseInt(allocation, 10) > 0 && (
+
+    {received !== '0' && parseInt(allocation, 10) > 0 && (
       <div className="text-muted text-left border rounded p-2 mb-2 learn-more">
         <img src={info} alt="" />
         <p className="m-0 p-0">

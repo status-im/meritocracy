@@ -10,7 +10,7 @@ import Loading from './Loading';
 import Complete from './Complete';
 import Error from './Error';
 import Withdrawal from './Withdrawal';
-import {sortByAlpha, sortByAttribute} from '../utils';
+import { sortByAlpha, sortByAttribute } from '../utils';
 import Praise from './Praise';
 /*
 TODO:
@@ -50,15 +50,15 @@ class Home extends React.Component {
 
   async componentDidMount() {
     try {
-      const contributorList = (await getFormattedContributorList());
+      const contributorList = await getFormattedContributorList();
 
       const currentContributor = await getCurrentContributorData();
 
-      this.setState({ busy: false, currentContributor, contributorList: contributorList.sort(sortByAlpha('label'))});
-      getAllPraises().then(praises => {
-        this.setState({praises: praises.sort(sortByAttribute('time'))});
-      });
+      this.setState({ busy: false, currentContributor, contributorList: contributorList.sort(sortByAlpha('label')) });
 
+      getAllPraises().then(praises => {
+        this.setState({ praises: praises.sort(sortByAttribute('time')) });
+      });
     } catch (error) {
       this.setState({ errorMsg: error.message || error });
     }
@@ -239,14 +239,16 @@ class Home extends React.Component {
           </Tab>
           <Tab eventKey="wall" title="Wall">
             <Container className="pt-4">
-              {praises.map((item, i) => <Praise key={i} individual={false} contributorList={contributorList} item={item} />)}
+              {praises.map((item, i) => (
+                <Praise key={i} individual={false} contributorList={contributorList} item={item} />
+              ))}
             </Container>
           </Tab>
           <Tab eventKey="withdraw" title="Withdraw" className="withdraw-panel">
             {step === 'HOME' && (
               <Withdrawal
                 onClick={this.withdrawTokens}
-                totalReceived={currentContributor.totalReceived}
+                received={currentContributor.received}
                 allocation={currentContributor.allocation}
                 contributorList={contributorList}
                 praises={currentContributor.praises}

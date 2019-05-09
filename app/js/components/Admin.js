@@ -5,14 +5,23 @@ import Input from 'react-validation/build/input';
 import { required, isAddress, isNumber, higherThan } from '../validators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { addContributor, getFormattedContributorList, removeContributor, getContributorData } from '../services/Meritocracy';
+import {
+  addContributor,
+  getFormattedContributorList,
+  removeContributor,
+  getContributorData,
+  forfeitAllocation,
+  lastForfeited,
+  allocate
+} from '../services/Meritocracy';
 import { sortByAlpha, sortByAttribute, sortNullableArray } from '../utils';
+import moment from 'moment';
 
 import './admin.scss';
 
-const sort = (orderBy) => {
-  if(orderBy === 'praises') return sortNullableArray('praises');
-  if(orderBy === 'label') return sortByAlpha('label');
+const sort = orderBy => {
+  if (orderBy === 'praises') return sortNullableArray('praises');
+  if (orderBy === 'label') return sortByAlpha('label');
   return sortByAttribute(orderBy);
 };
 
@@ -29,6 +38,7 @@ class Admin extends React.Component {
     sortBy: 'label',
     tab: 'admin',
     sntPerContributor: 0,
+    lastForfeited: null
   };
 
   async componentDidMount() {
@@ -37,15 +47,15 @@ class Admin extends React.Component {
 
       this.setState({ busy: false, contributorList });
 
+      this.getLastForfeitDate();
+
       // TODO: this can be replaced by event sourcing
       contributorList.forEach(contrib => {
-        getContributorData(contrib.value)
-          .then(data => {
-            contrib = Object.assign(contrib, data);
-            this.setState({contributorList});
-          });
+        getContributorData(contrib.value).then(data => {
+          contrib = Object.assign(contrib, data);
+          this.setState({ contributorList });
+        });
       });
-
     } catch (error) {
       this.setState({ errorMsg: error.message || error });
     }
@@ -55,9 +65,14 @@ class Admin extends React.Component {
     this.setState({ [name]: e.target.value });
   };
 
+  getLastForfeitDate = async () => {
+    const date = await lastForfeited();
+    this.setState({ lastForfeited: date });
+  };
+
   addContributor = async e => {
     e.preventDefault();
-    this.setState({ busy: true, successMsg: '' });
+    this.setState({ busy: true, successMsg: '', error: '' });
     try {
       await addContributor(this.state.contributorName, this.state.contributorAddress);
 
@@ -65,6 +80,39 @@ class Admin extends React.Component {
       contributorList.push({ label: this.state.contributorName, value: this.state.contributorAddress });
 
       this.setState({ busy: false, successMsg: 'Contributor added!' });
+    } catch (error) {
+      this.setState({ error: error.message || error, busy: false });
+    }
+  };
+
+  allocateFunds = async e => {
+    e.preventDefault();
+
+    if (!confirm('Are you sure?')) return;
+
+    this.setState({ busy: true, successMsg: '', error: '' });
+
+    const { contributorList, sntPerContributor } = this.state;
+    const sntAmount = web3.utils.toWei((contributorList.length * parseInt(sntPerContributor, 10)).toString(), 'ether');
+
+    try {
+      await allocate(sntAmount);
+      this.setState({ busy: false, successMsg: 'Funds allocated!' });
+    } catch (error) {
+      this.setState({ error: error.message || error, busy: false });
+    }
+  };
+
+  forfeit = async e => {
+    e.preventDefault();
+
+    if (!confirm('Are you sure?')) return;
+
+    this.setState({ busy: true, successMsg: '' });
+    try {
+      await forfeitAllocation();
+      await this.getLastForfeitDate();
+      this.setState({ busy: false, successMsg: 'Funds forfeited!' });
     } catch (error) {
       this.setState({ error: error.message || error, busy: false });
     }
@@ -94,12 +142,13 @@ class Admin extends React.Component {
     this.setState({ showDeleteModal: false });
   };
 
-  sortBy = (order) => () => {
-    this.setState({sortBy: order});
-  }
+  sortBy = order => () => {
+    this.setState({ sortBy: order });
+  };
 
   render() {
     const {
+      lastForfeited,
       contributorAddress,
       contributorName,
       error,
@@ -113,6 +162,9 @@ class Admin extends React.Component {
     } = this.state;
     const currentContributor = focusedContributorIndex > -1 ? contributorList[focusedContributorIndex] : {};
     const sortedContributorList = contributorList.sort(sort(sortBy));
+    const nextForfeit = (lastForfeited ? lastForfeited * 1000 : new Date().getTime()) + 86400 * 6 * 1000;
+    const nextForfeitDate =
+      new Date(nextForfeit).toLocaleDateString() + ' ' + new Date(nextForfeit).toLocaleTimeString();
 
     return (
       <Fragment>
@@ -156,7 +208,8 @@ class Admin extends React.Component {
             <ListGroup>
               {contributorList.sort(sortByAlpha('label')).map((contributor, idx) => (
                 <ListGroup.Item key={contributor.value} action className="contributor-item">
-                  <span className="font-weight-bold">{contributor.label}:</span> <span className="text-small">{contributor.value}</span>
+                  <span className="font-weight-bold">{contributor.label}:</span>{' '}
+                  <span className="text-small">{contributor.value}</span>
                   <div className="contributor-controls float-right">
                     <OverlayTrigger placement="top" overlay={<Tooltip>Delete contributor</Tooltip>}>
                       <FontAwesomeIcon
@@ -172,11 +225,14 @@ class Admin extends React.Component {
           </Tab>
           <Tab eventKey="allocation" title="Allocation" className="allocation-panel">
             <h2>Allocation</h2>
-            <ValidatedForm onSubmit={e => {alert("TODO")}}>
+            {error && <Alert variant="danger">{error}</Alert>}
+            {successMsg && <Alert variant="success">{successMsg}</Alert>}
+            {busy && <Alert variant="primary">Working...</Alert>}
+            <ValidatedForm>
               <Form.Group controlId="fundAllocation">
                 <Form.Label>SNT per contributor</Form.Label>
                 <Form.Text className="text-muted">
-                  Total: {(contributorList.length * parseInt(sntPerContributor, 10)) || 0} SNT
+                  Total: {contributorList.length * parseInt(sntPerContributor, 10) || 0} SNT
                 </Form.Text>
                 <Input
                   type="text"
@@ -187,21 +243,23 @@ class Admin extends React.Component {
                   validations={[required, isNumber, higherThan.bind(null, 0)]}
                 />
               </Form.Group>
-              <Button variant="primary" onClick={e => {alert("TODO")}}>
+              <Button variant="primary" onClick={this.allocateFunds}>
                 Allocate Funds
               </Button>
             </ValidatedForm>
             <hr className="mt-5 mb-5" />
-            <ValidatedForm onSubmit={e => {alert("TODO")}}>
+            <ValidatedForm>
               <Form.Group>
-                <Button variant="primary" onClick={e => {alert("TODO")}}>
+                <Button variant="primary" disabled={nextForfeit > new Date().getTime()} onClick={this.forfeit}>
                   Forfeit Allocation
                 </Button>
-                <Form.Text className="text-muted">
-                  Forfeited N days ago
-                </Form.Text>
+                {lastForfeited && (
+                  <Form.Text className="text-muted">
+                    Forfeited {moment.unix(lastForfeited).fromNow()}.<br />{' '}
+                    {nextForfeit > new Date().getTime() && 'Can be forfeited on ' + nextForfeitDate}
+                  </Form.Text>
+                )}
               </Form.Group>
-              
             </ValidatedForm>
           </Tab>
           <Tab eventKey="leaderboard" title="Leaderboard" className="leaderboard-panel">
@@ -217,17 +275,15 @@ class Admin extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                { 
-                  sortedContributorList.map((contrib, i) => (
-                    <tr key={i}>
-                      <td>{contrib.label}</td>
-                      <td>{contrib.allocation}</td>
-                      <td>{contrib.totalReceived}</td>
-                      <td>{contrib.totalForfeited}</td>
-                      <td>{contrib.praises ? contrib.praises.length : 0}</td>
-                    </tr>
-                  ))
-                } 
+                {sortedContributorList.map((contrib, i) => (
+                  <tr key={i}>
+                    <td>{contrib.label}</td>
+                    <td>{contrib.allocation}</td>
+                    <td>{contrib.totalReceived}</td>
+                    <td>{contrib.totalForfeited}</td>
+                    <td>{contrib.praises ? contrib.praises.length : 0}</td>
+                  </tr>
+                ))}
               </tbody>
             </Table>
           </Tab>

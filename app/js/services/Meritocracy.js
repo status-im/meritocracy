@@ -1,5 +1,7 @@
 /*global web3*/
 import Meritocracy from 'Embark/contracts/Meritocracy';
+import SNT from 'Embark/contracts/SNT';
+
 import EmbarkJS from 'Embark/EmbarkJS';
 
 let contributorList;
@@ -96,6 +98,79 @@ export async function getFormattedContributorList(hash) {
   });
 }
 
+export function forfeitAllocation() {
+  return new Promise(async (resolve, reject) => {
+    const mainAccount = web3.eth.defaultAccount;
+    try {
+      const toSend = Meritocracy.methods.forfeitAllocations();
+      let gas = await toSend.estimateGas({ from: mainAccount });
+      const receipt = await toSend.send({ from: mainAccount, gas: gas + 1000 });
+      resolve(receipt);
+    } catch (error) {
+      const message = 'Error forfeiting allocation';
+      console.error(message);
+      console.error(error);
+      reject(message);
+    }
+  });
+}
+
+export function allocate(sntAmount) {
+  return new Promise(async (resolve, reject) => {
+    const mainAccount = web3.eth.defaultAccount;
+    try {
+      let toSend, gas;
+
+      const balance = web3.utils.toBN(await SNT.methods.balanceOf(mainAccount).call());
+      const allowance = web3.utils.toBN(await SNT.methods.allowance(mainAccount, Meritocracy.options.address).call());
+
+      if (balance.lt(web3.utils.toBN(sntAmount))) {
+        throw new Error('Not enough SNT');
+      }
+
+      if (allowance.gt(web3.utils.toBN('0')) && allowance.lt(web3.utils.toBN(sntAmount))) {
+        alert('Reset allowance to 0');
+        toSend = SNT.methods.approve(Meritocracy.options.address, '0');
+        gas = await toSend.estimateGas({ from: mainAccount });
+        await toSend.send({ from: mainAccount, gas: gas + 1000 });
+      }
+
+      if (allowance.eq(web3.utils.toBN('0'))) {
+        alert(`Approving ${web3.utils.fromWei(sntAmount, 'ether')} to meritocracy contract`);
+        toSend = SNT.methods.approve(Meritocracy.options.address, sntAmount);
+        gas = await toSend.estimateGas({ from: mainAccount });
+        await toSend.send({ from: mainAccount, gas: gas + 1000 });
+      }
+
+      alert('Allocating SNT');
+      toSend = Meritocracy.methods.allocate(sntAmount);
+      gas = await toSend.estimateGas({ from: mainAccount });
+      await toSend.send({ from: mainAccount, gas: gas + 1000 });
+
+      resolve(true);
+    } catch (error) {
+      let message;
+
+      if (error.message === 'Not enough SNT') {
+        message = 'Not enough SNT';
+      } else {
+        message = 'Error forfeiting allocation';
+      }
+
+      console.error(message);
+      console.error(error);
+      reject(message);
+    }
+  });
+}
+
+export function lastForfeited() {
+  return new Promise(async resolve => {
+    const date = await Meritocracy.methods.lastForfeit().call();
+    resolve(date);
+  });
+}
+
 const prepareOptions = option => {
   if (option.value.match(/^0x[0-9A-Za-z]{40}$/)) {
     // Address
@@ -110,7 +185,7 @@ const prepareOptions = option => {
   return option;
 };
 
-export async function getCurrentContributorData(){
+export async function getCurrentContributorData() {
   const mainAccount = web3.eth.defaultAccount;
   const contribData = await getContributorData(mainAccount);
   return contribData;
@@ -120,7 +195,7 @@ export async function getContributorData(_address) {
   const currentContributor = await getContributor(_address);
 
   let praises = [];
-  for(let i = 0; i < currentContributor.praiseNum; i++){
+  for (let i = 0; i < currentContributor.praiseNum; i++) {
     praises.push(Meritocracy.methods.getStatus(_address, i).call());
   }
 
@@ -129,30 +204,29 @@ export async function getContributorData(_address) {
   }
 
   const contribData = contributorList.find(x => x.value === _address);
-  if(contribData) currentContributor.name = contribData.label;
+  if (contribData) currentContributor.name = contribData.label;
 
   currentContributor.praises = await Promise.all(praises);
-  currentContributor.allocation = web3.utils.fromWei(currentContributor.allocation, "ether");
-  currentContributor.totalForfeited = web3.utils.fromWei(currentContributor.totalForfeited, "ether");
-  currentContributor.totalReceived = web3.utils.fromWei(currentContributor.totalReceived, "ether");
-  currentContributor.received = web3.utils.fromWei(currentContributor.received, "ether");
+  currentContributor.allocation = web3.utils.fromWei(currentContributor.allocation, 'ether');
+  currentContributor.totalForfeited = web3.utils.fromWei(currentContributor.totalForfeited, 'ether');
+  currentContributor.totalReceived = web3.utils.fromWei(currentContributor.totalReceived, 'ether');
+  currentContributor.received = web3.utils.fromWei(currentContributor.received, 'ether');
 
   return currentContributor;
 }
 
 export function getAllPraises() {
-
   return new Promise(function(resolve) {
     let praisesPromises = [];
     let praiseNumPromises = [];
-    for(let i = 0; i < contributorList.length; i++){
+    for (let i = 0; i < contributorList.length; i++) {
       praiseNumPromises.push(Meritocracy.methods.getStatusLength(contributorList[i].value).call());
     }
 
     Promise.all(praiseNumPromises).then(praiseNums => {
-      for(let i = 0; i < contributorList.length; i++){
+      for (let i = 0; i < contributorList.length; i++) {
         let currPraises = [];
-        for(let j = 0; j < praiseNums[i]; j++){
+        for (let j = 0; j < praiseNums[i]; j++) {
           currPraises.push(Meritocracy.methods.getStatus(contributorList[i].value, j).call());
         }
         praisesPromises.push(currPraises);
@@ -165,17 +239,16 @@ export function getAllPraises() {
       );
 
       allPromises.then(praises => {
-        for(let i = 0; i < praises.length; i++){
+        for (let i = 0; i < praises.length; i++) {
           praises[i] = praises[i].map(x => {
             x.destination = contributorList[i].label;
             return x;
-          }); 
+          });
         }
         resolve(praises.flat());
       });
     });
   });
-
 }
 
 export async function getContributor(_address) {
