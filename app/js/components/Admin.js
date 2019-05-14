@@ -1,5 +1,6 @@
+/* global web3 */
 import React, { Fragment } from 'react';
-import { Button, Form, Alert, ListGroup, OverlayTrigger, Tooltip, Modal, Tabs, Tab, Table } from 'react-bootstrap';
+import { Button, Form, Alert, ListGroup, OverlayTrigger, Tooltip, Modal, Tabs, Tab } from 'react-bootstrap';
 import ValidatedForm from 'react-validation/build/form';
 import Input from 'react-validation/build/input';
 import { required, isAddress, isNumber, higherThan } from '../validators';
@@ -9,21 +10,14 @@ import {
   addContributor,
   getFormattedContributorList,
   removeContributor,
-  getContributorData,
   forfeitAllocation,
   lastForfeited,
   allocate
 } from '../services/Meritocracy';
-import { sortByAlpha, sortByAttribute, sortNullableArray } from '../utils';
+import { sortByAlpha } from '../utils';
 import moment from 'moment';
 
 import './admin.scss';
-
-const sort = orderBy => {
-  if (orderBy === 'praises') return sortNullableArray('praises');
-  if (orderBy === 'label') return sortByAlpha('label');
-  return sortByAttribute(orderBy);
-};
 
 class Admin extends React.Component {
   state = {
@@ -48,14 +42,6 @@ class Admin extends React.Component {
       this.setState({ busy: false, contributorList });
 
       this.getLastForfeitDate();
-
-      // TODO: this can be replaced by event sourcing
-      contributorList.forEach(contrib => {
-        getContributorData(contrib.value).then(data => {
-          contrib = Object.assign(contrib, data);
-          this.setState({ contributorList });
-        });
-      });
     } catch (error) {
       this.setState({ errorMsg: error.message || error });
     }
@@ -88,6 +74,7 @@ class Admin extends React.Component {
   allocateFunds = async e => {
     e.preventDefault();
 
+    /* eslint-disable-next-line no-alert*/
     if (!confirm('Are you sure?')) return;
 
     this.setState({ busy: true, successMsg: '', error: '' });
@@ -106,6 +93,7 @@ class Admin extends React.Component {
   forfeit = async e => {
     e.preventDefault();
 
+    /* eslint-disable-next-line no-alert*/
     if (!confirm('Are you sure?')) return;
 
     this.setState({ busy: true, successMsg: '' });
@@ -142,10 +130,6 @@ class Admin extends React.Component {
     this.setState({ showDeleteModal: false });
   };
 
-  sortBy = order => () => {
-    this.setState({ sortBy: order });
-  };
-
   render() {
     const {
       lastForfeited,
@@ -156,12 +140,10 @@ class Admin extends React.Component {
       contributorList,
       successMsg,
       focusedContributorIndex,
-      sortBy,
       tab,
       sntPerContributor
     } = this.state;
     const currentContributor = focusedContributorIndex > -1 ? contributorList[focusedContributorIndex] : {};
-    const sortedContributorList = contributorList.sort(sort(sortBy));
     const nextForfeit = (lastForfeited ? lastForfeited * 1000 : new Date().getTime()) + 86400 * 6 * 1000;
     const nextForfeitDate =
       new Date(nextForfeit).toLocaleDateString() + ' ' + new Date(nextForfeit).toLocaleTimeString();
@@ -261,31 +243,6 @@ class Admin extends React.Component {
                 )}
               </Form.Group>
             </ValidatedForm>
-          </Tab>
-          <Tab eventKey="leaderboard" title="Leaderboard" className="leaderboard-panel">
-            <h2>Leaderboard</h2>
-            <Table striped bordered hover responsive size="sm">
-              <thead>
-                <tr>
-                  <th onClick={this.sortBy('label')}>Contributor</th>
-                  <th onClick={this.sortBy('allocation')}>Allocation</th>
-                  <th onClick={this.sortBy('totalReceived')}>SNT Received</th>
-                  <th onClick={this.sortBy('totalForfeited')}>SNT Forfeited</th>
-                  <th onClick={this.sortBy('praises')}>Praises Received</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedContributorList.map((contrib, i) => (
-                  <tr key={i}>
-                    <td>{contrib.label}</td>
-                    <td>{contrib.allocation}</td>
-                    <td>{contrib.totalReceived}</td>
-                    <td>{contrib.totalForfeited}</td>
-                    <td>{contrib.praises ? contrib.praises.length : 0}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
           </Tab>
         </Tabs>
         <Modal show={this.state.showDeleteModal} onHide={this.handleClose}>

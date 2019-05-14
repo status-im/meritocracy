@@ -3,6 +3,7 @@ import React, { Fragment } from 'react';
 import moment from 'moment';
 import Address from './Address';
 import { Row, Col } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 const Praise = ({ contributorList, item, individual }) => {
   const name = contributorList.find(x => x.value === item.author);
@@ -31,6 +32,12 @@ const Praise = ({ contributorList, item, individual }) => {
       </Col>
     </Row>
   );
+};
+
+Praise.propTypes = {
+  contributorList: PropTypes.array,
+  individual: PropTypes.bool,
+  item: PropTypes.object
 };
 
 export default Praise;

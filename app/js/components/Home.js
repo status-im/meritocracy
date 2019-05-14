@@ -213,7 +213,7 @@ class Home extends React.Component {
                 onChangeAward={this.handleAwardChange}
                 onSelectContributor={this.handleContributorSelection}
                 onClickPlus5={this.handlePlus5}
-                contributorList={contributorList}
+                contributorList={contributorList.filter(x => x.value !== currentContributor.addr)}
                 selectedContributors={selectedContributors}
                 award={award}
                 isChecked={checkbox}

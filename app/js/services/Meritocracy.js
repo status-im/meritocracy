@@ -84,9 +84,7 @@ export async function getFormattedContributorList(hash) {
       list = list.map(prepareOptions);
 
       const registry = await Meritocracy.methods.getRegistry().call({ from: mainAccount });
-      list = list.filter(
-        contributorData => registry.includes(contributorData.value) && contributorData.value !== mainAccount
-      );
+      list = list.filter(contributorData => registry.includes(contributorData.value));
 
       resolve(list);
     } catch (error) {
