@@ -8,6 +8,7 @@ import EmbarkJS from 'Embark/EmbarkJS';
 import { isAdmin } from './services/Meritocracy';
 import Header from './components/Header';
 import Home from './components/Home';
+import Leaderboard from './components/Leaderboard';
 import Admin from './components/Admin';
 
 const MAINNET = 1;
@@ -65,8 +66,8 @@ class App extends React.Component {
           <Header isUserAdmin={isUserAdmin} />
           <Switch>
             <Route exact path="/" component={Home} />
+            <Route path="/leaderboard" component={Leaderboard} />
             {isUserAdmin && <Route exact path="/admin" component={Admin} />}
-
             <Redirect to="/404" />
           </Switch>
         </ThemeProvider>

@@ -24,7 +24,7 @@ export const isInteger = value => {
 };
 
 export const isNumber = value => {
-  if (Number.isNaN(value)) {
+  if (isNaN(value)) {
     return (
       <Form.Control.Feedback type="invalid" className="d-block">
         This field needs to be an number
