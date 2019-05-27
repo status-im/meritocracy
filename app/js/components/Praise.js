@@ -6,23 +6,29 @@ import { Row, Col } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 const Praise = ({ contributorList, item, individual }) => {
-  const name = contributorList.find(x => x.value === item.author);
-  const date = moment.unix(item.time).fromNow();
+  const name = contributorList.find(x => x.value.toLowerCase() === item.from.toLowerCase());
+  const date = moment.unix(item.timestamp).fromNow();
+
+  const destination = item.to.map(x => {
+    const name = contributorList.find(y => y.value.toLowerCase() === x.toLowerCase());
+    return name ? name.label : x;
+  });
+
   return (
     <Row>
       <Col className="mb-4 text-muted">
         {!item.praise && (
           <Fragment>
-            {(name && name.label) || <Address value={item.author} compact={true} />}{' '}
+            {(name && name.label) || <Address value={item.from} compact={true} />}{' '}
             {individual ? 'has sent you' : 'sent'} {web3.utils.fromWei(item.amount, 'ether')} SNT{' '}
-            {!individual && <span>to {item.destination}</span>}, <small>{date}</small>
+            {!individual && <span>to {destination.join(', ')}</span>}, <small>{date}</small>
           </Fragment>
         )}
 
         {item.praise && (
           <Fragment>
-            {(name && name.label) || <Address value={item.author} compact={true} />}
-            {!individual && <span> to {item.destination}</span>}, <small>{date}</small>
+            {(name && name.label) || <Address value={item.from} compact={true} />}
+            {!individual && <span> to {destination.join(', ')}</span>}, <small>{date}</small>
             <div className="chatBubble p-3">
               &quot;{item.praise}&quot;
               <small className="float-right">{web3.utils.fromWei(item.amount, 'ether')} SNT</small>

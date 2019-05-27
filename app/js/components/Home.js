@@ -1,5 +1,5 @@
 /*global web3*/
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Tabs, Tab, Container } from 'react-bootstrap';
 import Meritocracy from 'Embark/contracts/Meritocracy';
 import { getFormattedContributorList, getCurrentContributorData, getAllPraises } from '../services/Meritocracy';
@@ -10,8 +10,42 @@ import Loading from './Loading';
 import Complete from './Complete';
 import Error from './Error';
 import Withdrawal from './Withdrawal';
-import { sortByAlpha, sortByAttribute } from '../utils';
+import { sortByAlpha } from '../utils';
 import Praise from './Praise';
+import InfiniteScroll from 'react-infinite-scroller';
+
+import ApolloClient, { gql, InMemoryCache } from 'apollo-boost';
+import { ApolloProvider, Query } from 'react-apollo';
+
+const client = new ApolloClient({
+  uri: "https://api.thegraph.com/subgraphs/name/richard-ramos/kudos-dapp",
+  cache: new InMemoryCache()
+});
+
+const THE_WALL_QUERY = gql`
+  query WallQuery($skip: Int) {
+    kudos(first: 20, skip: $skip, orderBy: timestamp, orderDirection: desc){
+      from,
+      to,
+      praise,
+      timestamp,
+      amount
+    }
+  }
+`;
+
+const MY_RECEIVED_KUDOS = gql`
+  query KudosQUery($to: [Bytes]!, $skip: Int) {
+    kudos(where: {to: $to}, first: 50, skip: $skip, orderBy: timestamp, orderDirection: desc){
+      from,
+      to,
+      praise,
+      timestamp,
+      amount
+    }
+  }
+`;
+
 /*
 TODO:
 - list praise for contributor
@@ -35,7 +69,6 @@ class Home extends React.Component {
     step: 'HOME',
     checkbox: false,
     tab: 'reward',
-    praises: []
   };
 
   constructor(props) {
@@ -55,10 +88,6 @@ class Home extends React.Component {
       const currentContributor = await getCurrentContributorData();
 
       this.setState({ busy: false, currentContributor, contributorList: contributorList.sort(sortByAlpha('label')) });
-
-      getAllPraises().then(praises => {
-        this.setState({ praises: praises.sort(sortByAttribute('time')) });
-      });
     } catch (error) {
       this.setState({ errorMsg: error.message || error });
     }
@@ -194,7 +223,6 @@ class Home extends React.Component {
       award,
       currentContributor,
       praise,
-      praises,
       errorMsg,
       step,
       checkbox,
@@ -204,7 +232,7 @@ class Home extends React.Component {
     if (errorMsg) return <Error title="Error" message={errorMsg} onClick={this.moveStep('HOME')} />;
 
     return (
-      <Fragment>
+      <ApolloProvider client={client}>
         <Tabs className="home-tabs mb-3" activeKey={tab} onSelect={tab => this.setState({ tab })}>
           <Tab eventKey="reward" title="Reward" className="reward-panel">
             {step === 'HOME' && (
@@ -239,20 +267,83 @@ class Home extends React.Component {
           </Tab>
           <Tab eventKey="wall" title="Wall">
             <Container className="pt-4">
-              {praises.map((item, i) => (
-                <Praise key={i} individual={false} contributorList={contributorList} item={item} />
-              ))}
+              <Query
+                query={THE_WALL_QUERY}
+              >
+                {({ data, error, loading, fetchMore }) => {
+
+                  const loadMore = () => fetchMore({
+                    variables: {
+                      first: 30,
+                      skip: data.kudos.length
+                    },
+                    updateQuery: (prev, { fetchMoreResult }) => {
+                      if (!fetchMoreResult) return prev;
+                      return Object.assign({}, prev, {
+                        kudos: [...prev.kudos, ...fetchMoreResult.kudos]
+                      });
+                    }
+                  });
+
+                  if(loading) return <p>Loading...</p>;
+
+                  if(error) return <Error title="Error" message={error.message} />;
+
+                  return (
+                    <InfiniteScroll
+                      pageStart={0}
+                      loadMore={loadMore}
+                      hasMore={true}
+                      loader={<p key={new Date().getTime()}>Loading...</p>}
+                      initialLoad={false}
+                    >
+                      {data.kudos.map((item, i) => (
+                        <Praise key={i} individual={false} contributorList={contributorList} item={item} />
+                      ))}
+                    </InfiniteScroll>
+                  );
+                }}
+              </Query>
             </Container>
           </Tab>
           <Tab eventKey="withdraw" title="Withdraw" className="withdraw-panel">
             {step === 'HOME' && (
-              <Withdrawal
-                onClick={this.withdrawTokens}
-                received={currentContributor.received}
-                allocation={currentContributor.allocation}
-                contributorList={contributorList}
-                praises={currentContributor.praises}
-              />
+              <Query
+                query={MY_RECEIVED_KUDOS}
+                variables={{to: [web3.eth.defaultAccount]}}
+              >
+                {({ data, error, loading, fetchMore }) => {
+
+                  const loadMore = () => fetchMore({
+                    variables: {
+                      first: 30,
+                      skip: data.kudos.length,
+                      to: [web3.eth.defaultAccount]
+                    },
+                    updateQuery: (prev, { fetchMoreResult }) => {
+                      if (!fetchMoreResult) return prev;
+                      return Object.assign({}, prev, {
+                        kudos: [...prev.kudos, ...fetchMoreResult.kudos]
+                      });
+                    }
+                  });
+
+                  if(loading) return <p>Loading...</p>;
+
+                  if(error) return <Error title="Error" message={error.message} />;
+
+                  return (
+                    <Withdrawal
+                      onClick={this.withdrawTokens}
+                      received={currentContributor.received}
+                      allocation={currentContributor.allocation}
+                      contributorList={contributorList}
+                      praises={data.kudos}
+                      onLoadMore={loadMore}
+                    />
+                  );
+                }}
+              </Query>
             )}
 
             {step === 'BUSY' && <Loading />}
@@ -260,7 +351,7 @@ class Home extends React.Component {
             {step === 'COMPLETE' && <Complete onClick={this.moveStep('HOME')} />}
           </Tab>
         </Tabs>
-      </Fragment>
+      </ApolloProvider>
     );
   }
 }
