@@ -12,12 +12,18 @@ import {
   removeContributor,
   forfeitAllocation,
   lastForfeited,
-  allocate
+  allocate,
+  getAllowance,
+  approve,
+  resetAllowance,
+  getSNTBalance
 } from '../services/Meritocracy';
 import { sortByAlpha } from '../utils';
 import moment from 'moment';
 
 import './admin.scss';
+
+const toBN = web3.utils.toBN;
 
 class Admin extends React.Component {
   state = {
@@ -32,7 +38,9 @@ class Admin extends React.Component {
     sortBy: 'label',
     tab: 'admin',
     sntPerContributor: 0,
-    lastForfeited: null
+    lastForfeited: null,
+    allowance: '0',
+    balance: '0',
   };
 
   async componentDidMount() {
@@ -42,9 +50,16 @@ class Admin extends React.Component {
       this.setState({ busy: false, contributorList });
 
       this.getLastForfeitDate();
+      this.getAllowance();
     } catch (error) {
       this.setState({ errorMsg: error.message || error });
     }
+  }
+
+  getAllowance = async () => {
+    const allowance = await getAllowance();
+    const balance = await getSNTBalance();
+    this.setState({allowance, balance});
   }
 
   onChange = (name, e) => {
@@ -84,7 +99,50 @@ class Admin extends React.Component {
 
     try {
       await allocate(sntAmount);
-      this.setState({ busy: false, successMsg: 'Funds allocated!' });
+      this.setState({ busy: false, successMsg: 'Funds allocated!'});
+      this.getAllowance();
+    } catch (error) {
+      this.setState({ error: error.message || error, busy: false });
+    }
+  };
+
+  approve = async e => {
+    e.preventDefault();
+
+    /* eslint-disable-next-line no-alert*/
+    if (!confirm('Are you sure?')) return;
+
+    this.setState({ busy: true, successMsg: '', error: '' });
+
+    const { contributorList, sntPerContributor } = this.state;
+    const sntAmount = web3.utils.toWei((contributorList.length * parseInt(sntPerContributor, 10)).toString(), 'ether');
+
+    try {
+      await approve(sntAmount);
+      this.setState({ 
+        busy: false, 
+        successMsg: (contributorList.length * parseInt(sntPerContributor, 10)) + ' SNT approved for allocation',
+        allowance: sntAmount
+      });
+
+      this.getAllowance();
+    } catch (error) {
+      this.setState({ error: error.message || error, busy: false });
+    }
+  };
+
+  resetAllowance = async e => {
+    e.preventDefault();
+
+    /* eslint-disable-next-line no-alert*/
+    if (!confirm('Are you sure?')) return;
+
+    this.setState({ busy: true, successMsg: '', error: '' });
+
+    try {
+      await resetAllowance();
+      this.setState({ busy: false, successMsg: 'Allowance reset to 0', allowance: '0' });
+      this.getAllowance();
     } catch (error) {
       this.setState({ error: error.message || error, busy: false });
     }
@@ -141,12 +199,22 @@ class Admin extends React.Component {
       successMsg,
       focusedContributorIndex,
       tab,
-      sntPerContributor
+      sntPerContributor,
+      allowance,
+      balance
     } = this.state;
     const currentContributor = focusedContributorIndex > -1 ? contributorList[focusedContributorIndex] : {};
     const nextForfeit = (lastForfeited ? lastForfeited * 1000 : new Date().getTime()) + 86400 * 6 * 1000;
     const nextForfeitDate =
       new Date(nextForfeit).toLocaleDateString() + ' ' + new Date(nextForfeit).toLocaleTimeString();
+
+    const totalSntForContributors = web3.utils.toWei(toBN(contributorList.length * parseInt(sntPerContributor || '0', 10)), "ether");
+
+
+    const enoughBalance = toBN(balance).gte(toBN(totalSntForContributors));
+    const shouldApprove = toBN(totalSntForContributors).gt(toBN(0)) && toBN(allowance).lt(toBN(totalSntForContributors));
+    const shouldReset = toBN(allowance).gt(toBN(0)) && toBN(allowance).lt(toBN(totalSntForContributors));
+    const canAllocate = toBN(totalSntForContributors).gt(toBN(0)) && toBN(allowance).gte(toBN(totalSntForContributors));
 
     return (
       <Fragment>
@@ -214,7 +282,7 @@ class Admin extends React.Component {
               <Form.Group controlId="fundAllocation">
                 <Form.Label>SNT per contributor</Form.Label>
                 <Form.Text className="text-muted">
-                  Total: {contributorList.length * parseInt(sntPerContributor, 10) || 0} SNT
+                  Total: {contributorList.length * parseInt(sntPerContributor, 10) || 0} SNT,  (Balance: {web3.utils.fromWei(balance, "ether")} SNT, Approved: {web3.utils.fromWei(allowance, "ether")} SNT)
                 </Form.Text>
                 <Input
                   type="text"
@@ -225,9 +293,15 @@ class Admin extends React.Component {
                   validations={[required, isNumber, higherThan.bind(null, 0)]}
                 />
               </Form.Group>
-              <Button variant="primary" onClick={this.allocateFunds}>
-                Allocate Funds
-              </Button>
+              { enoughBalance && canAllocate && <Button variant="primary" disabled={busy} onClick={this.allocateFunds}>
+                Allocate {contributorList.length * parseInt(sntPerContributor || '0', 10)} SNT
+              </Button> }
+              { enoughBalance && shouldApprove && !shouldReset && <Button disabled={busy} variant="primary" onClick={this.approve}>
+                Approve {contributorList.length * parseInt(sntPerContributor || '0', 10)} SNT
+              </Button> }
+              { shouldApprove && shouldReset && <Button disabled={busy} variant="primary" onClick={this.resetAllowance}>
+                Reset existing approval
+              </Button> }
             </ValidatedForm>
             <hr className="mt-5 mb-5" />
             <ValidatedForm>
