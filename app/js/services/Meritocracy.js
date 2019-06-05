@@ -106,9 +106,51 @@ export function forfeitAllocation() {
       resolve(receipt);
     } catch (error) {
       const message = 'Error forfeiting allocation';
-      console.error(message);
       console.error(error);
       reject(message);
+    }
+  });
+}
+
+export function getSNTBalance() {
+  return new Promise(async (resolve) => {
+    const mainAccount = web3.eth.defaultAccount;
+    resolve(await SNT.methods.balanceOf(mainAccount).call());
+  });
+}
+
+
+export function getAllowance() {
+  return new Promise(async (resolve) => {
+    const mainAccount = web3.eth.defaultAccount;
+    resolve(await SNT.methods.allowance(mainAccount, Meritocracy.options.address).call());
+  });
+}
+
+export function resetAllowance() {
+  return new Promise(async (resolve, reject) => {
+    const mainAccount = web3.eth.defaultAccount;
+    try {
+      const toSend = SNT.methods.approve(Meritocracy.options.address, '0');
+      const gas = await toSend.estimateGas({ from: mainAccount });
+      const receipt = await toSend.send({ from: mainAccount, gas: gas + 1000 });
+      resolve(receipt);
+    } catch(error) {
+      reject(error);
+    }
+  });
+}
+
+export function approve(sntAmount) {
+  return new Promise(async (resolve, reject) => {
+    const mainAccount = web3.eth.defaultAccount;
+    try {
+      const toSend = SNT.methods.approve(Meritocracy.options.address, sntAmount);
+      const gas = await toSend.estimateGas({ from: mainAccount });
+      const receipt = await toSend.send({ from: mainAccount, gas: gas + 1000 });
+      resolve(receipt);
+    } catch(error) {
+      reject(error);
     }
   });
 }
@@ -118,33 +160,9 @@ export function allocate(sntAmount) {
     const mainAccount = web3.eth.defaultAccount;
     try {
       let toSend, gas;
-
-      const balance = web3.utils.toBN(await SNT.methods.balanceOf(mainAccount).call());
-      const allowance = web3.utils.toBN(await SNT.methods.allowance(mainAccount, Meritocracy.options.address).call());
-
-      if (balance.lt(web3.utils.toBN(sntAmount))) {
-        throw new Error('Not enough SNT');
-      }
-
-      if (allowance.gt(web3.utils.toBN('0')) && allowance.lt(web3.utils.toBN(sntAmount))) {
-        alert('Reset allowance to 0');
-        toSend = SNT.methods.approve(Meritocracy.options.address, '0');
-        gas = await toSend.estimateGas({ from: mainAccount });
-        await toSend.send({ from: mainAccount, gas: gas + 1000 });
-      }
-
-      if (allowance.eq(web3.utils.toBN('0'))) {
-        alert(`Approving ${web3.utils.fromWei(sntAmount, 'ether')} to meritocracy contract`);
-        toSend = SNT.methods.approve(Meritocracy.options.address, sntAmount);
-        gas = await toSend.estimateGas({ from: mainAccount });
-        await toSend.send({ from: mainAccount, gas: gas + 1000 });
-      }
-
-      alert('Allocating SNT');
       toSend = Meritocracy.methods.allocate(sntAmount);
       gas = await toSend.estimateGas({ from: mainAccount });
       await toSend.send({ from: mainAccount, gas: gas + 1000 });
-
       resolve(true);
     } catch (error) {
       let message;
@@ -152,10 +170,8 @@ export function allocate(sntAmount) {
       if (error.message === 'Not enough SNT') {
         message = 'Not enough SNT';
       } else {
-        message = 'Error forfeiting allocation';
+        message = 'Error doing allocation';
       }
-
-      console.error(message);
       console.error(error);
       reject(message);
     }
