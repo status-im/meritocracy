@@ -21,7 +21,9 @@ Extension:
     - /kudos 500 "<person>" "<praise>"
 */
 
-import "./token/ERC20Token.sol";
+import "token/ERC20Token.sol";
+import "token/ApproveAndCallFallBack.sol";
+
 
 contract Meritocracy {
 
@@ -89,6 +91,10 @@ contract Meritocracy {
 
     // Split amount over each contributor in registry, any contributor can allocate? TODO maybe relax this restriction, so anyone can allocate tokens
     function allocate(uint256 _amount) external {
+        _allocateFrom(msg.sender, _amount);
+    }
+
+    function _allocateFrom(address _from, uint256 _amount) private {
         // Locals
 
         // Contributor memory cAllocator = contributors[msg.sender];
@@ -103,8 +109,7 @@ contract Meritocracy {
 
         SNTforfeitedBalance = 0;
 
-        require(token.transferFrom(msg.sender, address(this), amount), "Couldn't transfer SNT");
-
+        require(token.transferFrom(_from, address(this), amount), "Couldn't transfer");
         // Body
         // cAllocator.inPot = true;
         for (uint256 i = 0; i < registry.length; i++) {
@@ -358,4 +363,34 @@ contract Meritocracy {
         // previousMeritocracy = Meritocracy(_previousMeritocracy);
         // importPreviousMeritocracyData() TODO
     }
+
+    function receiveApproval(address _from, uint256 _amount, address _token, bytes memory _data) public {
+        require(_token == address(token), "Wrong token");
+        require(_token == address(msg.sender), "Wrong call");
+
+        bytes4 sig;
+        uint amount;
+        (sig, amount) = abiDecode(_data);
+
+        require(_amount == amount, "Amounts must match");
+
+        require(
+            sig == bytes4(0x90ca796b), //bytes4(keccak256("allocate(uint)"))
+            "Wrong method selector"
+        );
+
+        _allocateFrom(_from, _amount);
+    }
+
+    function abiDecode(bytes memory _data) private pure returns (
+            bytes4 sig,
+            uint amount
+        )
+    {
+        assembly {
+            sig := mload(add(_data, add(0x20, 0)))
+            amount := mload(add(_data, 36))
+        }
+    }
+
 }
