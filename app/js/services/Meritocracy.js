@@ -40,7 +40,9 @@ export function removeContributor(address) {
       const idx = list.findIndex(contributor => contributor.value === address);
       list.splice(idx, 1);
 
-      const newHash = await saveContributorList(list);
+      const filteredList = list.filter(contributor => registry.includes(web3.utils.toChecksumAddress(contributor.value)));
+
+      const newHash = await saveContributorList(filteredList);
 
       const removeContributor = Meritocracy.methods.removeContributor(index, web3.utils.toHex(newHash));
       let gas = await removeContributor.estimateGas({ from: mainAccount });
