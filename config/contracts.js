@@ -1,4 +1,10 @@
 const options = require("../app/js/contributors");
+let secret = {};
+try {
+  secret = require('../.secret.json');
+} catch(err) {
+  console.dir("warning: .secret.json file not found; this is only needed to deploy to testnet or livenet etc..");
+}
 
 function getContributors () {
    var addresses = options.map(a => a.value);
@@ -201,10 +207,17 @@ module.exports = {
       }
     },
     deployment: {
-      accounts: [{
-        mnemonic: "your mainnet mnemonic here",
-        numAddresses: "10"
-      }]
+      accounts: [
+        {
+          mnemonic: secret.mnemonic,
+          hdpath: secret.hdpath || "m/44'/60'/0'/0/",
+          numAddresses: "10"
+        }
+      ],
+      host: `mainnet.infura.io/${secret.infuraKey}`,
+      port: false,
+      protocol: 'https',
+      type: "rpc"
     },
     "afterDeploy": [
       // Add All Contributors

@@ -21,7 +21,7 @@ Extension:
     - /kudos 500 "<person>" "<praise>"
 */
 
-import "token/ERC20Token.sol";
+import "./token/ERC20Token.sol";
 
 contract Meritocracy {
 
@@ -50,6 +50,7 @@ contract Meritocracy {
     mapping(address => bool) public admins;
     mapping(address => Contributor) public contributors;
     bytes public contributorListIPFSHash;
+    uint public SNTforfeitedBalance;
 
     Meritocracy public previousMeritocracy; // Reference and read from previous contract
 
@@ -74,13 +75,13 @@ contract Meritocracy {
 
     // Functions only Owner can call
     modifier onlyOwner {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "Only the owner can call this function");
         _;
     }
 
     // Functions only Admin can call
     modifier onlyAdmin {
-        require(admins[msg.sender]);
+        require(admins[msg.sender], "Only admins can call this function");
         _;
     }
 
@@ -93,14 +94,17 @@ contract Meritocracy {
         // Contributor memory cAllocator = contributors[msg.sender];
         // Requirements
         // require(cAllocator.addr != address(0)); // is sender a Contributor? TODO maybe relax this restriction.
-        uint256 individualAmount = _amount / registry.length;
+        uint256 individualAmount = (SNTforfeitedBalance + _amount) / registry.length;
 
         // removing decimals
         individualAmount = (individualAmount / 1 ether * 1 ether);
 
-        uint amount = individualAmount * registry.length;
+        uint amount = (individualAmount * registry.length) - SNTforfeitedBalance;
 
-        require(token.transferFrom(msg.sender, address(this), amount));
+        SNTforfeitedBalance = 0;
+
+        require(token.transferFrom(msg.sender, address(this), amount), "Couldn't transfer SNT");
+
         // Body
         // cAllocator.inPot = true;
         for (uint256 i = 0; i < registry.length; i++) {
@@ -119,9 +123,9 @@ contract Meritocracy {
         // Locals
          Contributor storage cReceiver = contributors[msg.sender];
          // Requirements
-        require(cReceiver.addr == msg.sender); //is sender a Contributor?
-        require(cReceiver.received > 0); // Contributor has received some tokens
-        require(cReceiver.allocation == 0); // Contributor must allocate all Token (or have Token burnt)  before they can withdraw.
+        require(cReceiver.addr == msg.sender, "Not a contributor"); //is sender a Contributor?
+        require(cReceiver.received > 0, "No tokens to withdraw"); // Contributor has received some tokens
+        require(cReceiver.allocation == 0, "Allocation needs to be awarded or forfeited"); // Contributor must allocate all Token (or have Token burnt)  before they can withdraw.
         // require(cReceiver.inPot); // Contributor has put some tokens into the pot
         // Body
         uint256 r = cReceiver.received;
@@ -236,7 +240,13 @@ contract Meritocracy {
         // Swap & Pop!
         registry[idx] = registry[registryLength];
         registry.pop();
-        delete contributors[c]; // TODO check if this works
+
+        // Automatically withdraw ex-contributor SNT and increasing the forfeited balance
+        Contributor storage contrib = contributors[c];
+        token.transfer(contrib.addr, contrib.received);
+        SNTforfeitedBalance += contrib.allocation;
+
+        delete contributors[c];
         // Set new IPFS hash for the list
         contributorListIPFSHash = _contributorListIPFSHash;
         emit ContributorRemoved(c);
@@ -260,6 +270,7 @@ contract Meritocracy {
         lastForfeit = block.timestamp;
         for (uint256 i = 0; i < registryLength; i++) { // should never be longer than maxContributors, see addContributor
                 Contributor storage c = contributors[registry[i]];
+                SNTforfeitedBalance += c.allocation;
                 c.totalForfeited += c.allocation; // Shaaaaame!
                 c.allocation = 0;
                 // cReceiver.inPot = false; // Contributor has to put tokens into next round
@@ -335,10 +346,6 @@ contract Meritocracy {
 
     // Constructor ------------------------------------------------------------------------------------------
 
-    // constructor(address _token, uint256 _maxContributors, address _previousMeritocracy) public {
-
-    // }
-
     // Set Owner, Token address,  initial maxContributors
     constructor(address _token, uint256 _maxContributors, bytes memory _contributorListIPFSHash) public {
         // Body
@@ -346,7 +353,7 @@ contract Meritocracy {
         addAdmin(owner);
         lastForfeit = block.timestamp;
         token = ERC20Token(_token);
-        maxContributors= _maxContributors;
+        maxContributors = _maxContributors;
         contributorListIPFSHash = _contributorListIPFSHash;
         // previousMeritocracy = Meritocracy(_previousMeritocracy);
         // importPreviousMeritocracyData() TODO
