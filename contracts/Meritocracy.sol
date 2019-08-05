@@ -370,9 +370,9 @@ contract Meritocracy {
 
         bytes4 sig;
         uint amount;
-        (sig, amount) = abiDecodeRegister(_data);
+        (sig, amount) = abiDecode(_data);
 
-        require(_amount == amount, "Amount must match");
+        require(_amount == amount, "Amounts must match");
 
         require(
             sig == bytes4(0x90ca796b), //bytes4(keccak256("allocate(uint)"))
@@ -382,7 +382,7 @@ contract Meritocracy {
         _allocateFrom(_from, _amount);
     }
 
-    function abiDecodeRegister(bytes memory _data) private pure returns (
+    function abiDecode(bytes memory _data) private pure returns (
             bytes4 sig,
             uint amount
         )
