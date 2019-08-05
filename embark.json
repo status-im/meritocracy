@@ -9,7 +9,7 @@
   "buildDir": "dist/",
   "config": "config/",
   "versions": {
-    "solc": "0.5.0",
+    "solc": "0.5.9",
     "ipfs-api": "17.2.4"
   },
   "plugins": {
