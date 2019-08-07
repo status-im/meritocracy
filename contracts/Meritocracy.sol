@@ -95,6 +95,7 @@ contract Meritocracy {
     }
 
     function _allocateFrom(address _from, uint256 _amount) private {
+        require(_amount != 0, "Amount can't be 0");
         // Locals
 
         // Contributor memory cAllocator = contributors[msg.sender];

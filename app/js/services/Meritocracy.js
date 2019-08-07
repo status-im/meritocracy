@@ -114,6 +114,19 @@ export function forfeitAllocation() {
   });
 }
 
+export function getRegistryNum() {
+  return new Promise(async (resolve) => {
+    const registry = await Meritocracy.methods['getRegistry']().call();
+    resolve(registry.length);
+  });
+}
+
+export function getSNTForfeitedBalance() {
+  return new Promise(async (resolve) => {
+    resolve(await Meritocracy.methods.SNTforfeitedBalance().call());
+  });
+}
+
 export function getSNTBalance() {
   return new Promise(async (resolve) => {
     const mainAccount = web3.eth.defaultAccount;
@@ -162,7 +175,8 @@ export function allocate(sntAmount) {
     const mainAccount = web3.eth.defaultAccount;
     try {
       let toSend, gas;
-      toSend = Meritocracy.methods.allocate(sntAmount);
+      const abiEncoded = Meritocracy.methods.allocate(sntAmount).encodeABI();
+      toSend = SNT.methods.approveAndCall(Meritocracy.options.address, sntAmount, abiEncoded);
       gas = await toSend.estimateGas({ from: mainAccount });
       await toSend.send({ from: mainAccount, gas: gas + 1000 });
       resolve(true);

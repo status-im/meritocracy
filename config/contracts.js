@@ -14,7 +14,7 @@ function getContributors () {
    return addresses;
 }
 
-const OG_IPFS_HASH = '0x516d5968703543324c75646d45333239436d41594671625767733869577036625177396355714576544742356163';
+const OG_IPFS_HASH = '0x516d526d47374c4d73416962584445416a57364673333471696953674a514a3276586b6839774d68626157734e67';
 
 module.exports = {
   // default applies to all environments
@@ -135,7 +135,7 @@ module.exports = {
         // Add All Contributors
         console.log('Adding all tokens...');
         const contributors = getContributors();
-        contributors.push(mainAccount);
+        
         const addContributors = Meritocracy.methods.addContributors(contributors, OG_IPFS_HASH);
         gas = await addContributors.estimateGas({from: mainAccount});
         await addContributors.send({from: mainAccount, gas});
